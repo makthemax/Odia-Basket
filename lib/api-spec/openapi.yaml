@@ -1,22 +1,28 @@
 openapi: 3.1.0
 info:
-  # Do not change the title, if the title changes, the import paths will be broken
   title: Api
   version: 0.1.0
-  description: API specification
+  description: Bhubaneswar Greens - Organic Delivery API
 servers:
   - url: /api
     description: Base API path
 tags:
   - name: health
     description: Health operations
+  - name: products
+    description: Product catalog operations
+  - name: cart
+    description: Cart operations
+  - name: orders
+    description: Order operations
+  - name: categories
+    description: Category operations
 paths:
   /healthz:
     get:
       operationId: healthCheck
       tags: [health]
       summary: Health check
-      description: Returns server health status
       responses:
         "200":
           description: Healthy
@@ -24,6 +30,186 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/HealthStatus"
+
+  /categories:
+    get:
+      operationId: listCategories
+      tags: [categories]
+      summary: List all categories
+      responses:
+        "200":
+          description: List of categories
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Category"
+
+  /products:
+    get:
+      operationId: listProducts
+      tags: [products]
+      summary: List products with optional filtering
+      parameters:
+        - name: categoryId
+          in: query
+          required: false
+          schema:
+            type: integer
+        - name: search
+          in: query
+          required: false
+          schema:
+            type: string
+        - name: featured
+          in: query
+          required: false
+          schema:
+            type: boolean
+      responses:
+        "200":
+          description: List of products
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Product"
+
+  /products/{id}:
+    get:
+      operationId: getProduct
+      tags: [products]
+      summary: Get product by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Product details
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Product"
+        "404":
+          description: Product not found
+
+  /products/featured:
+    get:
+      operationId: getFeaturedProducts
+      tags: [products]
+      summary: Get featured/seasonal products
+      responses:
+        "200":
+          description: Featured products
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Product"
+
+  /orders:
+    get:
+      operationId: listOrders
+      tags: [orders]
+      summary: List all orders
+      parameters:
+        - name: phone
+          in: query
+          required: false
+          schema:
+            type: string
+      responses:
+        "200":
+          description: List of orders
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Order"
+    post:
+      operationId: createOrder
+      tags: [orders]
+      summary: Create a new order
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateOrderBody"
+      responses:
+        "201":
+          description: Order created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Order"
+
+  /orders/{id}:
+    get:
+      operationId: getOrder
+      tags: [orders]
+      summary: Get order by ID (for tracking)
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Order details
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Order"
+        "404":
+          description: Order not found
+
+  /orders/{id}/status:
+    patch:
+      operationId: updateOrderStatus
+      tags: [orders]
+      summary: Update order status
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateOrderStatusBody"
+      responses:
+        "200":
+          description: Updated order
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Order"
+
+  /stats/summary:
+    get:
+      operationId: getStoreSummary
+      tags: [products]
+      summary: Get store summary stats
+      responses:
+        "200":
+          description: Store summary
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/StoreSummary"
+
 components:
   schemas:
     HealthStatus:
@@ -34,3 +220,220 @@ components:
       required:
         - status
 
+    Category:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        nameOdia:
+          type: string
+        slug:
+          type: string
+        imageUrl:
+          type: string
+        productCount:
+          type: integer
+      required:
+        - id
+        - name
+        - nameOdia
+        - slug
+
+    Product:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        nameOdia:
+          type: string
+        description:
+          type: string
+        price:
+          type: number
+        unit:
+          type: string
+        imageUrl:
+          type: string
+        categoryId:
+          type: integer
+        categoryName:
+          type: string
+        inStock:
+          type: boolean
+        isFeatured:
+          type: boolean
+        isSeasonal:
+          type: boolean
+        discountPercent:
+          type: integer
+        farmName:
+          type: string
+        origin:
+          type: string
+      required:
+        - id
+        - name
+        - nameOdia
+        - price
+        - unit
+        - inStock
+        - isFeatured
+        - isSeasonal
+
+    CreateOrderBody:
+      type: object
+      properties:
+        customerName:
+          type: string
+        phone:
+          type: string
+        address:
+          type: string
+        locality:
+          type: string
+        pincode:
+          type: string
+        paymentMethod:
+          type: string
+          enum: [cod, upi, card]
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/OrderItemInput"
+        totalAmount:
+          type: number
+        notes:
+          type: string
+      required:
+        - customerName
+        - phone
+        - address
+        - locality
+        - pincode
+        - paymentMethod
+        - items
+        - totalAmount
+
+    OrderItemInput:
+      type: object
+      properties:
+        productId:
+          type: integer
+        quantity:
+          type: number
+        priceAtOrder:
+          type: number
+      required:
+        - productId
+        - quantity
+        - priceAtOrder
+
+    UpdateOrderStatusBody:
+      type: object
+      properties:
+        status:
+          type: string
+          enum: [pending, confirmed, packed, out_for_delivery, delivered, cancelled]
+      required:
+        - status
+
+    OrderItem:
+      type: object
+      properties:
+        id:
+          type: integer
+        productId:
+          type: integer
+        productName:
+          type: string
+        quantity:
+          type: number
+        unit:
+          type: string
+        priceAtOrder:
+          type: number
+      required:
+        - id
+        - productId
+        - productName
+        - quantity
+        - unit
+        - priceAtOrder
+
+    Order:
+      type: object
+      properties:
+        id:
+          type: integer
+        orderNumber:
+          type: string
+        customerName:
+          type: string
+        phone:
+          type: string
+        address:
+          type: string
+        locality:
+          type: string
+        pincode:
+          type: string
+        status:
+          type: string
+          enum: [pending, confirmed, packed, out_for_delivery, delivered, cancelled]
+        paymentMethod:
+          type: string
+        totalAmount:
+          type: number
+        notes:
+          type: string
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/OrderItem"
+        createdAt:
+          type: string
+        updatedAt:
+          type: string
+        estimatedDelivery:
+          type: string
+      required:
+        - id
+        - orderNumber
+        - customerName
+        - phone
+        - address
+        - locality
+        - pincode
+        - status
+        - paymentMethod
+        - totalAmount
+        - items
+        - createdAt
+
+    StoreSummary:
+      type: object
+      properties:
+        totalProducts:
+          type: integer
+        totalCategories:
+          type: integer
+        featuredCount:
+          type: integer
+        deliveryAreas:
+          type: array
+          items:
+            type: string
+        todayDeliverySlots:
+          type: array
+          items:
+            type: string
+      required:
+        - totalProducts
+        - totalCategories
+        - featuredCount
+        - deliveryAreas
+        - todayDeliverySlots
