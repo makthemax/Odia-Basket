@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useParams, Link } from "wouter";
 import { motion } from "framer-motion";
-import { ArrowLeft, Plus, Minus, ShoppingCart, Zap, MapPin, Leaf } from "lucide-react";
+import { ArrowLeft, Plus, Minus, ShoppingCart, Zap, MapPin, Sprout } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
@@ -107,7 +107,7 @@ export default function ProductDetail() {
             <div className="space-y-2">
               {product.farmName && (
                 <div className="flex items-center gap-2 text-sm">
-                  <Leaf className="h-4 w-4 text-secondary" />
+                  <Sprout className="h-4 w-4 text-secondary" />
                   <span className="text-muted-foreground">Farm:</span>
                   <span className="font-medium">{product.farmName}</span>
                 </div>

@@ -1,7 +1,7 @@
 import { Link, useLocation } from "wouter";
 import { useEffect, useState } from "react";
 import { useCart } from "@/hooks/use-cart";
-import { ShoppingCart, Leaf, MapPin, Search, ChevronDown, Tag } from "lucide-react";
+import { ShoppingCart, Sprout, MapPin, Search, ChevronDown, Tag } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 
@@ -45,7 +45,7 @@ export function Navbar() {
         <div className="max-w-7xl mx-auto px-3 md:px-6 h-16 flex items-center gap-3 md:gap-6">
           <Link href="/" className="flex items-center gap-2 font-extrabold text-lg md:text-xl tracking-tight text-primary shrink-0">
             <div className="h-9 w-9 rounded-full bg-primary/10 flex items-center justify-center">
-              <Leaf className="h-5 w-5" />
+              <Sprout className="h-5 w-5" />
             </div>
             <span className="hidden sm:block leading-none">
               Bhubaneswar

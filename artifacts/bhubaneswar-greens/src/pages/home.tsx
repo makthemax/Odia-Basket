@@ -1,6 +1,6 @@
 import { Link } from "wouter";
 import { motion } from "framer-motion";
-import { ArrowRight, Leaf, Truck, Star, Clock, Zap, ShieldCheck, BadgePercent, Flame } from "lucide-react";
+import { ArrowRight, Sprout, Truck, Star, Clock, Zap, ShieldCheck, BadgePercent, Flame } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { useGetFeaturedProducts, useListCategories, useGetStoreSummary } from "@workspace/api-client-react";
@@ -162,7 +162,7 @@ export default function Home() {
             </div>
           </div>
         </div>
-        <Leaf className="absolute right-4 top-4 h-20 w-20 text-white/10 rotate-12" />
+        <Sprout className="absolute right-4 top-4 h-20 w-20 text-white/10 rotate-12" />
         <VeggieIllustration className="hidden sm:block absolute right-2 md:right-8 bottom-0 h-48 md:h-64 w-auto" />
       </motion.div>
 
@@ -191,7 +191,7 @@ export default function Home() {
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
         {[
           { icon: Zap, title: "60-min Delivery", sub: "Across Bhubaneswar" },
-          { icon: Leaf, title: "100% Organic", sub: "FSSAI Certified" },
+          { icon: Sprout, title: "100% Organic", sub: "FSSAI Certified" },
           { icon: Truck, title: "FREE above ₹199", sub: "Orders ₹199+" },
           { icon: ShieldCheck, title: "Easy Returns", sub: "Quality guarantee" },
         ].map(({ icon: Icon, title, sub }) => (
@@ -244,7 +244,7 @@ export default function Home() {
                       {cat.imageUrl ? (
                         <img src={cat.imageUrl} alt={cat.name} className="w-full h-full object-cover" />
                       ) : (
-                        <Leaf className="h-6 w-6 text-primary" />
+                        <Sprout className="h-6 w-6 text-primary" />
                       )}
                     </div>
                     <p className="text-[11px] font-bold text-center leading-tight text-foreground">{cat.name}</p>

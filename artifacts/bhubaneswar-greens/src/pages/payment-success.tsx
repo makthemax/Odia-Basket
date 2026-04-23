@@ -1,6 +1,6 @@
 import { useSearch, Link } from "wouter";
 import { motion } from "framer-motion";
-import { CheckCircle, Package, ArrowRight, Leaf } from "lucide-react";
+import { CheckCircle, Package, ArrowRight, Sprout } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 export default function PaymentSuccess() {
@@ -33,7 +33,7 @@ export default function PaymentSuccess() {
               transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
               className="absolute -top-2 -right-2"
             >
-              <Leaf className="h-6 w-6 text-primary" />
+              <Sprout className="h-6 w-6 text-primary" />
             </motion.div>
           </div>
         </motion.div>
