@@ -9,6 +9,7 @@ import { useGetProduct } from "@workspace/api-client-react";
 import { useCart } from "@/hooks/use-cart";
 import { useToast } from "@/hooks/use-toast";
 import { useLocation } from "wouter";
+import { ProductImage } from "@/components/vegetable-illustrations";
 
 export default function ProductDetail() {
   const { id } = useParams<{ id: string }>();
@@ -66,8 +67,12 @@ export default function ProductDetail() {
           className="relative"
         >
           <div className="aspect-square rounded-3xl overflow-hidden bg-muted">
-            {product.imageUrl && (
-              <img src={product.imageUrl} alt={product.name} className="w-full h-full object-cover" />
+            {(
+              <ProductImage
+                product={product}
+                className="w-full h-full"
+                imgClassName="w-full h-full object-cover"
+              />
             )}
           </div>
           <div className="absolute top-3 left-3 flex flex-col gap-1">

@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
 import { useCart } from "@/hooks/use-cart";
+import { ProductImage } from "@/components/vegetable-illustrations";
 
 const FREE_DELIVERY_THRESHOLD = 199;
 
@@ -93,9 +94,11 @@ export default function Cart() {
                   className="flex gap-3 p-3 bg-card rounded-2xl border border-card-border shadow-sm"
                 >
                   <div className="h-24 w-24 rounded-xl overflow-hidden bg-muted shrink-0 relative">
-                    {product.imageUrl && (
-                      <img src={product.imageUrl} alt={product.name} className="w-full h-full object-cover" />
-                    )}
+                    <ProductImage
+                      product={product}
+                      className="w-full h-full"
+                      imgClassName="w-full h-full object-cover"
+                    />
                     {d > 0 && (
                       <div className="absolute top-0 left-0 bg-secondary text-white text-[9px] font-bold px-1.5 py-0.5 rounded-br-md">
                         {d}% OFF

@@ -9,6 +9,7 @@ import { useListProducts, useListCategories } from "@workspace/api-client-react"
 import { useCart } from "@/hooks/use-cart";
 import { useToast } from "@/hooks/use-toast";
 import { Link } from "wouter";
+import { ProductImage } from "@/components/vegetable-illustrations";
 
 function ProductCard({ product }: { product: any }) {
   const { addItem, items, updateQuantity } = useCart();
@@ -36,13 +37,12 @@ function ProductCard({ product }: { product: any }) {
     >
       <Link href={`/products/${product.id}`}>
         <div className="relative aspect-[4/3] overflow-hidden bg-muted">
-          {product.imageUrl && (
-            <img
-              src={product.imageUrl}
-              alt={product.name}
-              className="w-full h-full object-cover transition-transform hover:scale-105 duration-300"
-            />
-          )}
+          <ProductImage
+            product={product}
+            className="w-full h-full"
+            imgClassName="w-full h-full object-cover transition-transform hover:scale-105 duration-300"
+          />
+
           {discount > 0 && product.inStock && (
             <div className="absolute top-0 left-0 bg-secondary text-white text-[10px] font-bold px-2 py-1 rounded-br-lg shadow">
               {discount}% OFF
