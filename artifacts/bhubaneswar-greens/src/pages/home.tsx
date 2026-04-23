@@ -1,6 +1,6 @@
 import { Link } from "wouter";
 import { motion } from "framer-motion";
-import { ArrowRight, Leaf, Truck, Star, Clock } from "lucide-react";
+import { ArrowRight, Leaf, Truck, Star, Clock, Zap, ShieldCheck, BadgePercent, Flame } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { useGetFeaturedProducts, useListCategories, useGetStoreSummary } from "@workspace/api-client-react";
@@ -16,11 +16,17 @@ function ProductCard({ product }: { product: any }) {
     toast({ title: `${product.name} added to cart`, description: "Aapana cart update hela!" });
   };
 
+  const discount = product.discountPercent ?? 0;
+  const mrp = discount > 0 ? Math.round(product.price / (1 - discount / 100)) : null;
+  // Pseudo-rating derived from id (stable per product) — replace with real ratings later
+  const rating = (4.0 + ((product.id * 7) % 10) / 10).toFixed(1);
+  const ratingCount = 80 + ((product.id * 31) % 900);
+
   return (
     <motion.div
       whileHover={{ y: -4 }}
       transition={{ type: "spring", stiffness: 300 }}
-      className="bg-card rounded-2xl overflow-hidden border border-card-border shadow-sm hover:shadow-md transition-shadow"
+      className="bg-card rounded-2xl overflow-hidden border border-card-border shadow-sm hover:shadow-md transition-shadow flex flex-col"
     >
       <div className="relative aspect-[4/3] overflow-hidden bg-muted">
         {product.imageUrl && (
@@ -30,38 +36,92 @@ function ProductCard({ product }: { product: any }) {
             className="w-full h-full object-cover transition-transform hover:scale-105 duration-300"
           />
         )}
+        {discount > 0 && product.inStock && (
+          <div className="absolute top-0 left-0 bg-secondary text-white text-[10px] font-bold px-2 py-1 rounded-br-lg shadow">
+            {discount}% OFF
+          </div>
+        )}
         {product.isSeasonal && (
-          <Badge className="absolute top-2 left-2 bg-amber-500 text-white text-[10px]">Seasonal</Badge>
+          <Badge className="absolute top-2 right-2 bg-amber-500 text-white text-[10px] gap-1 border-0 shadow">
+            <Flame className="h-3 w-3" /> Seasonal
+          </Badge>
         )}
         {!product.inStock && (
-          <div className="absolute inset-0 bg-black/40 flex items-center justify-center">
+          <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
             <Badge variant="destructive">Astock Nahi</Badge>
           </div>
         )}
-        {product.discountPercent > 0 && product.inStock && (
-          <Badge className="absolute top-2 right-2 bg-primary text-primary-foreground text-[10px]">{product.discountPercent}% OFF</Badge>
-        )}
       </div>
-      <div className="p-3">
-        <p className="text-[11px] text-muted-foreground font-medium">{product.nameOdia}</p>
-        <h3 className="font-semibold text-sm mt-0.5 truncate">{product.name}</h3>
-        <div className="flex items-center justify-between mt-2">
-          <div>
-            <span className="text-base font-bold text-primary">Rs.{product.price}</span>
-            <span className="text-xs text-muted-foreground ml-1">/{product.unit}</span>
-          </div>
+      <div className="p-3 flex flex-col flex-1">
+        <div className="flex items-center gap-1.5 mb-1">
+          <span className="inline-flex items-center gap-0.5 bg-emerald-600 text-white text-[10px] font-bold px-1.5 py-0.5 rounded">
+            {rating} <Star className="h-2.5 w-2.5 fill-white" />
+          </span>
+          <span className="text-[10px] text-muted-foreground">({ratingCount})</span>
+        </div>
+        <p className="text-[11px] text-muted-foreground font-medium truncate">{product.nameOdia}</p>
+        <h3 className="font-semibold text-sm leading-tight line-clamp-1">{product.name}</h3>
+        <p className="text-[10px] text-muted-foreground mt-0.5">{product.unit}</p>
+
+        <div className="mt-2 flex items-center gap-1.5">
+          <span className="text-base font-extrabold text-foreground">₹{product.price}</span>
+          {mrp && (
+            <>
+              <span className="text-xs text-muted-foreground line-through">₹{mrp}</span>
+              <span className="text-[10px] font-bold text-secondary">SAVE ₹{mrp - product.price}</span>
+            </>
+          )}
+        </div>
+
+        <div className="mt-1 flex items-center gap-1 text-[10px] text-emerald-700">
+          <Zap className="h-3 w-3" /> Delivery in 60 min
+        </div>
+
+        <div className="mt-2.5">
           {product.inStock ? (
-            <Button size="sm" onClick={handleAdd} className="h-8 text-xs px-3">
-              Add
+            <Button
+              size="sm"
+              onClick={handleAdd}
+              variant="outline"
+              className="w-full h-8 text-xs font-bold border-secondary/40 text-secondary hover:bg-secondary hover:text-white"
+            >
+              ADD
             </Button>
           ) : (
-            <Button size="sm" disabled className="h-8 text-xs px-3">Out</Button>
+            <Button size="sm" disabled variant="outline" className="w-full h-8 text-xs">Out of stock</Button>
           )}
         </div>
       </div>
     </motion.div>
   );
 }
+
+const DEAL_TILES = [
+  {
+    title: "Mega Pariba Sale",
+    sub: "Up to 30% OFF on saags",
+    cta: "Shop Saag",
+    href: "/products?category=1",
+    bg: "from-rose-500 to-pink-600",
+    emoji: "🥬",
+  },
+  {
+    title: "Combo Bachat",
+    sub: "Buy 2 Get 1 — Mix & Match",
+    cta: "Grab Combos",
+    href: "/products",
+    bg: "from-violet-600 to-indigo-700",
+    emoji: "🛒",
+  },
+  {
+    title: "Aaji ka Special",
+    sub: "Cuttack Greens — fresh today",
+    cta: "Order Now",
+    href: "/products",
+    bg: "from-emerald-600 to-teal-700",
+    emoji: "🌿",
+  },
+];
 
 export default function Home() {
   const { data: featured = [], isLoading: featuredLoading } = useGetFeaturedProducts();
@@ -77,50 +137,178 @@ export default function Home() {
         className="relative rounded-3xl overflow-hidden bg-gradient-to-br from-primary via-orange-500 to-amber-400 text-white px-6 py-10 md:py-16"
       >
         <div className="relative z-10 max-w-md">
-          <Badge className="bg-white/20 text-white border-0 mb-3">Bhubaneswar's Own Sabji Store</Badge>
+          <div className="flex flex-wrap gap-2 mb-3">
+            <Badge className="bg-white text-primary border-0 font-bold gap-1 shadow">
+              <Zap className="h-3 w-3" /> 60-min delivery
+            </Badge>
+            <Badge className="bg-white/20 text-white border border-white/30 font-semibold">
+              Bhubaneswar's Own Sabji Store
+            </Badge>
+          </div>
           <h1 className="text-3xl md:text-5xl font-extrabold leading-tight mb-3">
             Gharaku Fresh <br /> Pariba!
           </h1>
-          <p className="text-white/90 text-sm md:text-base mb-6">
+          <p className="text-white/90 text-sm md:text-base mb-5">
             Farm-fresh organic vegetables delivered straight to your home in Bhubaneswar. Directly from Odia farms, no middlemen.
           </p>
-          <div className="flex gap-3">
+          <div className="flex flex-wrap items-center gap-3">
             <Link href="/products">
-              <Button variant="secondary" className="bg-white text-primary hover:bg-white/90 font-semibold">
+              <Button variant="secondary" className="bg-white text-primary hover:bg-white/90 font-bold h-11 px-5 rounded-xl shadow-md">
                 Shop Now <ArrowRight className="ml-1 h-4 w-4" />
               </Button>
             </Link>
+            <div className="flex items-center gap-1.5 text-white/95 text-xs font-semibold bg-white/15 backdrop-blur px-3 py-2 rounded-xl border border-white/20">
+              <BadgePercent className="h-4 w-4" /> Use code <span className="font-extrabold">FRESH50</span> · ₹50 OFF
+            </div>
           </div>
         </div>
         <Leaf className="absolute right-4 top-4 h-20 w-20 text-white/10 rotate-12" />
         <VeggieIllustration className="hidden sm:block absolute right-2 md:right-8 bottom-0 h-48 md:h-64 w-auto" />
       </motion.div>
 
-      {/* Trust Badges */}
-      <div className="grid grid-cols-3 gap-3">
+      {/* Deal Tiles - desi promo banner row */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+        {DEAL_TILES.map((d) => (
+          <Link key={d.title} href={d.href}>
+            <motion.div
+              whileHover={{ y: -2 }}
+              className={`relative overflow-hidden rounded-2xl bg-gradient-to-br ${d.bg} text-white p-4 cursor-pointer shadow-sm hover:shadow-md transition-shadow h-28`}
+            >
+              <div className="relative z-10">
+                <p className="text-[11px] font-bold uppercase tracking-wider opacity-90">{d.sub}</p>
+                <h3 className="text-lg font-extrabold leading-tight mt-0.5">{d.title}</h3>
+                <p className="text-xs font-bold mt-2 inline-flex items-center gap-1 underline-offset-2 underline">
+                  {d.cta} <ArrowRight className="h-3 w-3" />
+                </p>
+              </div>
+              <span className="absolute -right-2 -bottom-3 text-7xl opacity-30 leading-none select-none">{d.emoji}</span>
+            </motion.div>
+          </Link>
+        ))}
+      </div>
+
+      {/* Trust strip */}
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
         {[
-          { icon: Truck, title: "Gharaku Deliver", sub: "Same day delivery" },
-          { icon: Leaf, title: "100% Organic", sub: "No chemicals" },
-          { icon: Star, title: "Local Farmers", sub: "Direct from Odisha" },
+          { icon: Zap, title: "60-min Delivery", sub: "Across Bhubaneswar" },
+          { icon: Leaf, title: "100% Organic", sub: "FSSAI Certified" },
+          { icon: Truck, title: "FREE above ₹199", sub: "Orders ₹199+" },
+          { icon: ShieldCheck, title: "Easy Returns", sub: "Quality guarantee" },
         ].map(({ icon: Icon, title, sub }) => (
-          <div key={title} className="flex flex-col items-center text-center p-3 bg-card rounded-xl border border-card-border">
-            <Icon className="h-6 w-6 text-primary mb-1" />
-            <p className="text-xs font-semibold">{title}</p>
-            <p className="text-[10px] text-muted-foreground">{sub}</p>
+          <div key={title} className="flex items-center gap-3 p-3 bg-card rounded-xl border border-card-border">
+            <div className="h-9 w-9 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
+              <Icon className="h-4 w-4 text-primary" />
+            </div>
+            <div className="min-w-0">
+              <p className="text-xs font-bold leading-tight">{title}</p>
+              <p className="text-[10px] text-muted-foreground leading-tight mt-0.5">{sub}</p>
+            </div>
           </div>
         ))}
       </div>
 
+      {/* Categories - BigBasket-style colorful tiles */}
+      <div>
+        <div className="flex items-end justify-between mb-4">
+          <div>
+            <h2 className="text-lg md:text-xl font-extrabold">Shop by Category</h2>
+            <p className="text-xs text-muted-foreground mt-0.5">Fresh from Odisha's farms</p>
+          </div>
+          <Link href="/products" className="text-xs md:text-sm text-primary font-bold hover:underline">View all →</Link>
+        </div>
+        {catLoading ? (
+          <div className="grid grid-cols-3 md:grid-cols-6 gap-3">
+            {Array.from({ length: 6 }).map((_, i) => (
+              <div key={i} className="aspect-square rounded-2xl bg-muted animate-pulse" />
+            ))}
+          </div>
+        ) : (
+          <div className="grid grid-cols-3 md:grid-cols-6 gap-3">
+            {categories.map((cat: any, i: number) => {
+              const tones = [
+                "from-emerald-100 to-emerald-50 border-emerald-200",
+                "from-amber-100 to-amber-50 border-amber-200",
+                "from-rose-100 to-rose-50 border-rose-200",
+                "from-violet-100 to-violet-50 border-violet-200",
+                "from-sky-100 to-sky-50 border-sky-200",
+                "from-orange-100 to-orange-50 border-orange-200",
+              ];
+              const tone = tones[i % tones.length];
+              return (
+                <Link key={cat.id} href={`/products?category=${cat.id}`}>
+                  <motion.div
+                    whileHover={{ scale: 1.04 }}
+                    className={`relative flex flex-col items-center justify-end gap-1 p-3 pt-12 bg-gradient-to-b ${tone} border rounded-2xl cursor-pointer transition-shadow hover:shadow-md aspect-square overflow-hidden`}
+                  >
+                    <div className="absolute top-2 left-1/2 -translate-x-1/2 h-14 w-14 rounded-full bg-white shadow-md ring-2 ring-white overflow-hidden flex items-center justify-center">
+                      {cat.imageUrl ? (
+                        <img src={cat.imageUrl} alt={cat.name} className="w-full h-full object-cover" />
+                      ) : (
+                        <Leaf className="h-6 w-6 text-primary" />
+                      )}
+                    </div>
+                    <p className="text-[11px] font-bold text-center leading-tight text-foreground">{cat.name}</p>
+                  </motion.div>
+                </Link>
+              );
+            })}
+          </div>
+        )}
+      </div>
+
+      {/* Deal of the Day banner */}
+      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-secondary/10 via-emerald-50 to-amber-50 border border-secondary/20 p-5 md:p-6 flex items-center justify-between gap-4">
+        <div className="flex items-center gap-3 min-w-0">
+          <div className="h-12 w-12 rounded-full bg-secondary text-white flex items-center justify-center shrink-0 shadow-md">
+            <Flame className="h-6 w-6" />
+          </div>
+          <div className="min-w-0">
+            <p className="text-[10px] font-bold text-secondary uppercase tracking-widest">Aaji ka Deal · Today Only</p>
+            <h3 className="text-base md:text-lg font-extrabold leading-tight">Fresh Picks at Farm Prices</h3>
+            <p className="text-xs text-muted-foreground truncate">Hand-picked from Khordha, Cuttack & Puri farms today morning</p>
+          </div>
+        </div>
+        <Link href="/products" className="shrink-0">
+          <Button className="bg-secondary hover:bg-secondary/90 text-white h-10 rounded-xl font-bold">
+            Shop Deals
+          </Button>
+        </Link>
+      </div>
+
+      {/* Featured Products */}
+      <div>
+        <div className="flex items-end justify-between mb-4">
+          <div>
+            <h2 className="text-lg md:text-xl font-extrabold">Today's Fresh Picks</h2>
+            <p className="text-xs text-muted-foreground mt-0.5">Harvested this morning · Free delivery in 60 mins</p>
+          </div>
+          <Link href="/products" className="text-xs md:text-sm text-primary font-bold hover:underline">View all →</Link>
+        </div>
+        {featuredLoading ? (
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            {Array.from({ length: 4 }).map((_, i) => (
+              <div key={i} className="aspect-[3/4] rounded-2xl bg-muted animate-pulse" />
+            ))}
+          </div>
+        ) : (
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4">
+            {featured.slice(0, 8).map((product: any) => (
+              <ProductCard key={product.id} product={product} />
+            ))}
+          </div>
+        )}
+      </div>
+
       {/* Delivery Areas */}
       {summary && (
-        <div className="bg-secondary/10 rounded-2xl p-4 border border-secondary/20">
+        <div className="bg-secondary/5 rounded-2xl p-4 md:p-5 border border-secondary/20">
           <div className="flex items-center gap-2 mb-3">
             <Truck className="h-4 w-4 text-secondary" />
-            <h2 className="font-semibold text-sm text-secondary">Delivery Areas in Bhubaneswar</h2>
+            <h2 className="font-bold text-sm text-secondary">Delivery Areas in Bhubaneswar</h2>
           </div>
           <div className="flex flex-wrap gap-2">
             {summary.deliveryAreas.map((area: string) => (
-              <Badge key={area} variant="outline" className="text-xs border-secondary/40 text-secondary">
+              <Badge key={area} variant="outline" className="text-xs border-secondary/40 text-secondary bg-white">
                 {area}
               </Badge>
             ))}
@@ -134,78 +322,22 @@ export default function Home() {
         </div>
       )}
 
-      {/* Categories */}
-      <div>
-        <div className="flex items-center justify-between mb-4">
-          <h2 className="text-lg font-bold">Shop by Category</h2>
-          <Link href="/products" className="text-sm text-primary font-medium hover:underline">View all</Link>
-        </div>
-        {catLoading ? (
-          <div className="grid grid-cols-3 md:grid-cols-6 gap-3">
-            {Array.from({ length: 6 }).map((_, i) => (
-              <div key={i} className="aspect-square rounded-2xl bg-muted animate-pulse" />
-            ))}
-          </div>
-        ) : (
-          <div className="grid grid-cols-3 md:grid-cols-6 gap-3">
-            {categories.map((cat: any) => (
-              <Link key={cat.id} href={`/products?category=${cat.id}`}>
-                <motion.div
-                  whileHover={{ scale: 1.05 }}
-                  className="flex flex-col items-center gap-2 p-3 bg-card rounded-2xl border border-card-border cursor-pointer hover:border-primary/40 transition-colors"
-                >
-                  <div className="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center overflow-hidden">
-                    {cat.imageUrl ? (
-                      <img src={cat.imageUrl} alt={cat.name} className="w-full h-full object-cover rounded-full" />
-                    ) : (
-                      <Leaf className="h-5 w-5 text-primary" />
-                    )}
-                  </div>
-                  <p className="text-[10px] font-semibold text-center leading-tight">{cat.name}</p>
-                </motion.div>
-              </Link>
-            ))}
-          </div>
-        )}
-      </div>
-
-      {/* Featured Products */}
-      <div>
-        <div className="flex items-center justify-between mb-4">
-          <h2 className="text-lg font-bold">Today's Fresh Picks</h2>
-          <Link href="/products" className="text-sm text-primary font-medium hover:underline">View all</Link>
-        </div>
-        {featuredLoading ? (
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            {Array.from({ length: 4 }).map((_, i) => (
-              <div key={i} className="aspect-[3/4] rounded-2xl bg-muted animate-pulse" />
-            ))}
-          </div>
-        ) : (
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            {featured.slice(0, 8).map((product: any) => (
-              <ProductCard key={product.id} product={product} />
-            ))}
-          </div>
-        )}
-      </div>
-
       {/* Stats */}
       {summary && (
-        <div className="bg-primary/5 rounded-2xl p-5 border border-primary/10">
-          <h2 className="font-bold mb-4 text-center">Why Choose Bhubaneswar Greens?</h2>
+        <div className="bg-gradient-to-br from-primary/5 via-amber-50 to-orange-50 rounded-2xl p-5 md:p-6 border border-primary/10">
+          <h2 className="font-extrabold mb-4 text-center text-base md:text-lg">Why Bhubaneswar Greens?</h2>
           <div className="grid grid-cols-3 gap-4 text-center">
             <div>
-              <p className="text-2xl font-extrabold text-primary">{summary.totalProducts}+</p>
-              <p className="text-xs text-muted-foreground">Varieties</p>
+              <p className="text-2xl md:text-3xl font-extrabold text-primary">{summary.totalProducts}+</p>
+              <p className="text-[11px] text-muted-foreground font-semibold">Fresh Varieties</p>
             </div>
             <div>
-              <p className="text-2xl font-extrabold text-primary">{summary.totalCategories}</p>
-              <p className="text-xs text-muted-foreground">Categories</p>
+              <p className="text-2xl md:text-3xl font-extrabold text-primary">{summary.totalCategories}</p>
+              <p className="text-[11px] text-muted-foreground font-semibold">Categories</p>
             </div>
             <div>
-              <p className="text-2xl font-extrabold text-primary">{summary.deliveryAreas.length}+</p>
-              <p className="text-xs text-muted-foreground">Areas Served</p>
+              <p className="text-2xl md:text-3xl font-extrabold text-primary">{summary.deliveryAreas.length}+</p>
+              <p className="text-[11px] text-muted-foreground font-semibold">Areas Served</p>
             </div>
           </div>
         </div>
