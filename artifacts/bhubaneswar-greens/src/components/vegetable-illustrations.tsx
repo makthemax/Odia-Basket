@@ -192,8 +192,101 @@ export function CauliflowerIllustration({ className }: IllustrationProps) {
   );
 }
 
+export function PumpkinIllustration({ className }: IllustrationProps) {
+  return (
+    <svg
+      className={className}
+      viewBox="0 0 400 400"
+      xmlns="http://www.w3.org/2000/svg"
+      aria-hidden="true"
+    >
+      <defs>
+        <radialGradient id="pk-bg" cx="50%" cy="45%" r="65%">
+          <stop offset="0%" stopColor="#fff7ed" />
+          <stop offset="100%" stopColor="#fed7aa" />
+        </radialGradient>
+        <radialGradient id="pk-lobe" cx="40%" cy="35%" r="70%">
+          <stop offset="0%" stopColor="#fdba74" />
+          <stop offset="55%" stopColor="#f97316" />
+          <stop offset="100%" stopColor="#9a3412" />
+        </radialGradient>
+        <radialGradient id="pk-lobe-side" cx="50%" cy="40%" r="70%">
+          <stop offset="0%" stopColor="#fb923c" />
+          <stop offset="60%" stopColor="#ea580c" />
+          <stop offset="100%" stopColor="#7c2d12" />
+        </radialGradient>
+        <linearGradient id="pk-stem" x1="0%" y1="0%" x2="0%" y2="100%">
+          <stop offset="0%" stopColor="#65a30d" />
+          <stop offset="100%" stopColor="#365314" />
+        </linearGradient>
+        <linearGradient id="pk-leaf" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stopColor="#86efac" />
+          <stop offset="60%" stopColor="#22c55e" />
+          <stop offset="100%" stopColor="#14532d" />
+        </linearGradient>
+      </defs>
+
+      <rect width="400" height="400" fill="url(#pk-bg)" />
+      <ellipse cx="200" cy="345" rx="140" ry="14" fill="#000" opacity="0.15" />
+
+      {/* curly tendril */}
+      <path
+        d="M250 110 C 270 95, 285 105, 280 125 C 275 145, 295 145, 300 130"
+        stroke="#65a30d"
+        strokeWidth="3"
+        fill="none"
+        strokeLinecap="round"
+      />
+
+      {/* leaf */}
+      <path
+        d="M160 120
+           C 110 95, 80 115, 95 155
+           C 125 165, 160 150, 175 130 Z"
+        fill="url(#pk-leaf)"
+      />
+      <path
+        d="M100 145 C 130 140, 155 135, 172 128"
+        stroke="#14532d"
+        strokeWidth="2"
+        fill="none"
+        opacity="0.55"
+      />
+
+      {/* outer side lobes */}
+      <ellipse cx="105" cy="225" rx="55" ry="100" fill="url(#pk-lobe-side)" />
+      <ellipse cx="295" cy="225" rx="55" ry="100" fill="url(#pk-lobe-side)" />
+
+      {/* middle lobes */}
+      <ellipse cx="150" cy="220" rx="60" ry="115" fill="url(#pk-lobe)" />
+      <ellipse cx="250" cy="220" rx="60" ry="115" fill="url(#pk-lobe)" />
+
+      {/* center lobe */}
+      <ellipse cx="200" cy="215" rx="70" ry="125" fill="url(#pk-lobe)" />
+
+      {/* lobe ridges */}
+      <path d="M165 110 C 158 200, 158 250, 168 320" stroke="#7c2d12" strokeWidth="2.5" fill="none" opacity="0.55" />
+      <path d="M235 110 C 242 200, 242 250, 232 320" stroke="#7c2d12" strokeWidth="2.5" fill="none" opacity="0.55" />
+      <path d="M115 145 C 110 215, 112 270, 122 315" stroke="#7c2d12" strokeWidth="2" fill="none" opacity="0.45" />
+      <path d="M285 145 C 290 215, 288 270, 278 315" stroke="#7c2d12" strokeWidth="2" fill="none" opacity="0.45" />
+
+      {/* highlights */}
+      <ellipse cx="180" cy="160" rx="22" ry="50" fill="#ffffff" opacity="0.25" />
+      <ellipse cx="135" cy="180" rx="10" ry="30" fill="#ffffff" opacity="0.2" />
+
+      {/* stem */}
+      <path
+        d="M188 105 L 195 75 C 198 65, 210 65, 213 75 L 218 108 Z"
+        fill="url(#pk-stem)"
+      />
+      <path d="M200 78 L 200 105" stroke="#1a2e05" strokeWidth="1.2" opacity="0.6" />
+    </svg>
+  );
+}
+
 export const VEGETABLE_ILLUSTRATIONS: Record<string, (props: IllustrationProps) => ReactNode> = {
   cauliflower: CauliflowerIllustration,
+  pumpkin: PumpkinIllustration,
 };
 
 export function getIllustration(name?: string) {
