@@ -10,7 +10,7 @@ const STEPS = [
   { status: "confirmed", label: "Confirmed", sub: "Seller confirmed your order", icon: CheckCircle },
   { status: "packed", label: "Packed", sub: "Vegetables packed fresh for you", icon: Package },
   { status: "out_for_delivery", label: "Out for Delivery", sub: "Our delivery partner is on the way", icon: Truck },
-  { status: "delivered", label: "Delivered", sub: "Enjoy your fresh tarkari!", icon: Home },
+  { status: "delivered", label: "Delivered", sub: "Enjoy your fresh pariba!", icon: Home },
 ];
 
 const STATUS_ORDER = ["pending", "confirmed", "packed", "out_for_delivery", "delivered"];

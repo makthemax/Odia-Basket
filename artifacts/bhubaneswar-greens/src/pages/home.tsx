@@ -79,7 +79,7 @@ export default function Home() {
         <div className="relative z-10 max-w-md">
           <Badge className="bg-white/20 text-white border-0 mb-3">Bhubaneswar's Own Sabji Store</Badge>
           <h1 className="text-3xl md:text-5xl font-extrabold leading-tight mb-3">
-            Gharaku Fresh <br /> Tarkari!
+            Gharaku Fresh <br /> Pariba!
           </h1>
           <p className="text-white/90 text-sm md:text-base mb-6">
             Farm-fresh organic vegetables delivered straight to your home in Bhubaneswar. Directly from Odia farms, no middlemen.

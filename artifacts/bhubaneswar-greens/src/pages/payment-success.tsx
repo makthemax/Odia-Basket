@@ -40,7 +40,7 @@ export default function PaymentSuccess() {
 
         <div>
           <h1 className="text-3xl font-extrabold text-secondary">Order Confirmed!</h1>
-          <p className="text-muted-foreground mt-2">Aapana tarkari rasta re achi! Your fresh vegetables are on their way.</p>
+          <p className="text-muted-foreground mt-2">Aapana pariba rasta re achi! Your fresh vegetables are on their way.</p>
         </div>
 
         {orderNumber && (
