@@ -318,24 +318,25 @@ function VeggieIllustration({ className }: { className?: string }) {
         <circle cx="197" cy="241" r="3.5" fill="#fca5a5" opacity="0.8" />
       </g>
 
-      <g opacity="0.85">
-        <ellipse cx="232" cy="234" rx="10" ry="14" fill="#7c3aed" transform="rotate(-15 232 234)" />
-        <ellipse cx="244" cy="240" rx="9" ry="12" fill="#7c3aed" transform="rotate(-15 244 240)" />
-        <path d="M232 218c-2-4 0-8 4-8" stroke="#16a34a" strokeWidth="2" strokeLinecap="round" fill="none" />
-      </g>
-
       <g>
         <path
-          d="M50 180c-4-2-6-6-4-10 2-4 8-6 12-2 0-6 6-10 12-8 2-4 8-6 12-2 4-2 10 0 12 6 4 0 6 4 6 8-2 4-6 6-10 6-2 4-6 6-10 4-2 4-8 4-12 2-2 2-6 2-10 0-4 0-8-2-8-4z"
-          fill="#fff"
-          opacity="0.95"
+          d="M232 246c-14-2-22-16-20-30 2-12 10-22 20-26 4-2 8-2 12 0 6-4 14-2 18 4 6 6 8 16 6 24-2 14-12 26-26 28-4 0-8 0-10 0z"
+          fill="#4c1d95"
         />
         <path
-          d="M76 162c0-4 2-8 6-10M64 168c-2-2-2-6 0-8"
-          stroke="#16a34a"
-          strokeWidth="2"
-          strokeLinecap="round"
-          fill="none"
+          d="M232 218c-4-6 2-14 10-12-4 4-6 8-4 12 4-2 8-2 10 2-6 0-10 4-12 8-2-4-2-8-4-10z"
+          fill="#16a34a"
+          stroke="#166534"
+          strokeWidth="1"
+        />
+        <ellipse
+          cx="240"
+          cy="232"
+          rx="3"
+          ry="8"
+          fill="#7c3aed"
+          opacity="0.5"
+          transform="rotate(-20 240 232)"
         />
       </g>
     </svg>
