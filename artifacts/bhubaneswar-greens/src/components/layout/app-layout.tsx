@@ -1,6 +1,7 @@
 import { ReactNode } from "react";
 import { Navbar } from "./navbar";
 import { MobileNav } from "./mobile-nav";
+import { WhatsAppFab } from "@/components/whatsapp-fab";
 
 export function AppLayout({ children }: { children: ReactNode }) {
   return (
@@ -10,6 +11,7 @@ export function AppLayout({ children }: { children: ReactNode }) {
         {children}
       </main>
       <MobileNav />
+      <WhatsAppFab />
     </div>
   );
 }
