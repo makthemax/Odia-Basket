@@ -92,7 +92,8 @@ export default function Home() {
             </Link>
           </div>
         </div>
-        <Leaf className="absolute right-4 bottom-4 h-32 w-32 text-white/10 rotate-12" />
+        <Leaf className="absolute right-4 top-4 h-20 w-20 text-white/10 rotate-12" />
+        <VeggieIllustration className="hidden sm:block absolute right-2 md:right-8 bottom-0 h-48 md:h-64 w-auto" />
       </motion.div>
 
       {/* Trust Badges */}
@@ -210,5 +211,133 @@ export default function Home() {
         </div>
       )}
     </div>
+  );
+}
+
+function VeggieIllustration({ className }: { className?: string }) {
+  return (
+    <svg
+      className={className}
+      viewBox="0 0 320 280"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+      aria-hidden="true"
+    >
+      <ellipse cx="160" cy="248" rx="140" ry="14" fill="#000" opacity="0.12" />
+
+      <g>
+        <path
+          d="M70 200c-22-6-36-26-32-50 4-22 24-36 46-32 6-20 28-30 48-22 14-12 36-12 50 2 18-4 36 8 40 26 16 4 26 22 22 38-4 18-22 30-40 28-2 18-20 30-38 26-10 14-30 18-44 8-14 8-34 4-44-8-2 0-4 0-8-2"
+          fill="#65a30d"
+        />
+        <path
+          d="M82 168c14-2 24 6 32 16M120 150c10 4 18 14 20 26M170 142c-2 14 6 26 18 32M210 158c-4 12 2 26 14 32"
+          stroke="#3f6212"
+          strokeWidth="2"
+          strokeLinecap="round"
+          opacity="0.5"
+        />
+      </g>
+
+      <g>
+        <path
+          d="M126 196c-2-22 12-42 32-44 22-2 42 14 44 36 2 22-14 42-36 44-22 2-38-14-40-36z"
+          fill="#dc2626"
+        />
+        <path
+          d="M126 196c-1-12 4-24 12-32 2 14 8 26 18 34-12 4-22 4-30-2z"
+          fill="#ef4444"
+        />
+        <path
+          d="M158 156c0-6-2-10-6-14 6-2 12-2 16 2 4-2 8-2 12 0-2 6-6 10-12 12"
+          fill="#16a34a"
+        />
+        <ellipse cx="148" cy="178" rx="6" ry="4" fill="#fca5a5" opacity="0.7" />
+      </g>
+
+      <g>
+        <path
+          d="M218 220c-14-4-22-18-18-32 2-8 8-14 16-16-2-12 6-22 18-22 4-10 14-16 24-12 8-12 24-12 32 0 12-2 22 8 22 20 8 4 12 14 8 22 4 10-2 22-12 26-2 10-12 16-22 14-6 8-18 10-26 4-8 8-22 6-30-2-4 2-8 2-12-2z"
+          fill="#f97316"
+        />
+        <path
+          d="M260 162c0-8-4-14-10-18 8-4 16-2 22 4 6-4 14-2 18 4-2 8-10 14-18 14"
+          fill="#16a34a"
+        />
+      </g>
+
+      <g>
+        <ellipse cx="80" cy="222" rx="34" ry="22" fill="#7c2d12" />
+        <ellipse cx="80" cy="218" rx="34" ry="22" fill="#a16207" />
+        <path
+          d="M62 210c4-4 10-6 16-4M86 206c6 0 12 2 16 6M70 224c4 2 10 2 14 0"
+          stroke="#78350f"
+          strokeWidth="1.5"
+          strokeLinecap="round"
+          opacity="0.6"
+        />
+        <path
+          d="M76 196c-2-6 0-12 4-16 4 4 6 10 4 16"
+          fill="#16a34a"
+          stroke="#166534"
+          strokeWidth="1"
+        />
+      </g>
+
+      <g>
+        <path
+          d="M40 240c10-2 18-12 18-22 0-12-10-22-22-22-8 0-14 4-18 10 0 0-2 18 6 28s16 6 16 6z"
+          fill="#fb923c"
+        />
+        <path
+          d="M40 196c-2-6-2-12 2-16 6-2 12 2 14 8"
+          stroke="#16a34a"
+          strokeWidth="3"
+          strokeLinecap="round"
+          fill="none"
+        />
+      </g>
+
+      <g>
+        <path
+          d="M270 232c12-4 18-18 14-30-4-12-18-18-30-12-4 2-8 6-10 10 0 0-4 14 6 24s20 8 20 8z"
+          fill="#facc15"
+        />
+        <path d="M278 198c2-6 0-12-4-16" stroke="#16a34a" strokeWidth="3" strokeLinecap="round" fill="none" />
+      </g>
+
+      <g>
+        <circle cx="118" cy="232" r="14" fill="#dc2626" />
+        <circle cx="114" cy="228" r="4" fill="#fca5a5" opacity="0.8" />
+        <path d="M118 218c0-4 2-6 6-8" stroke="#16a34a" strokeWidth="2" strokeLinecap="round" fill="none" />
+
+        <circle cx="148" cy="240" r="10" fill="#dc2626" />
+        <circle cx="146" cy="238" r="3" fill="#fca5a5" opacity="0.8" />
+
+        <circle cx="200" cy="244" r="12" fill="#dc2626" />
+        <circle cx="197" cy="241" r="3.5" fill="#fca5a5" opacity="0.8" />
+      </g>
+
+      <g opacity="0.85">
+        <ellipse cx="232" cy="234" rx="10" ry="14" fill="#7c3aed" transform="rotate(-15 232 234)" />
+        <ellipse cx="244" cy="240" rx="9" ry="12" fill="#7c3aed" transform="rotate(-15 244 240)" />
+        <path d="M232 218c-2-4 0-8 4-8" stroke="#16a34a" strokeWidth="2" strokeLinecap="round" fill="none" />
+      </g>
+
+      <g>
+        <path
+          d="M50 180c-4-2-6-6-4-10 2-4 8-6 12-2 0-6 6-10 12-8 2-4 8-6 12-2 4-2 10 0 12 6 4 0 6 4 6 8-2 4-6 6-10 6-2 4-6 6-10 4-2 4-8 4-12 2-2 2-6 2-10 0-4 0-8-2-8-4z"
+          fill="#fff"
+          opacity="0.95"
+        />
+        <path
+          d="M76 162c0-4 2-8 6-10M64 168c-2-2-2-6 0-8"
+          stroke="#16a34a"
+          strokeWidth="2"
+          strokeLinecap="round"
+          fill="none"
+        />
+      </g>
+    </svg>
   );
 }
