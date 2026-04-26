@@ -134,8 +134,9 @@ export default function Home() {
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="relative rounded-3xl overflow-hidden bg-gradient-to-br from-primary via-orange-500 to-amber-400 text-white px-6 py-10 md:py-16"
+        className="relative rounded-3xl overflow-hidden bg-gradient-to-br from-primary via-orange-500 to-amber-400 text-white px-6 py-10 md:py-16 ring-1 ring-orange-300/60 border-2 border-white/40 shadow-[0_10px_40px_-12px_rgba(234,88,12,0.55)]"
       >
+        <div className="absolute inset-0 rounded-3xl ring-1 ring-inset ring-white/15 pointer-events-none" />
         <div className="relative z-10 max-w-md">
           <div className="flex flex-wrap gap-2 mb-3">
             <Badge className="bg-white text-primary border-0 font-bold gap-1 shadow">
@@ -145,8 +146,9 @@ export default function Home() {
               Bhubaneswar's Own Sabji Store
             </Badge>
           </div>
-          <h1 className="text-3xl md:text-5xl font-extrabold leading-tight mb-3">
-            Gharaku Fresh <br /> Pariba!
+          <h1 className="text-4xl md:text-6xl font-light leading-[1.05] mb-4 tracking-tight" style={{ fontFamily: '"Playfair Display", "Georgia", serif' }}>
+            <span className="block italic font-extralight text-white/95">Gharaku Fresh</span>
+            <span className="block font-semibold tracking-tighter">Pariba<span className="text-amber-100">.</span></span>
           </h1>
           <p className="text-white/90 text-sm md:text-base mb-5">
             Farm-fresh organic vegetables delivered straight to your home in Bhubaneswar. Directly from Odia farms, no middlemen.
