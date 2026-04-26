@@ -1,10 +1,12 @@
 import { Link, useLocation } from "wouter";
-import { Home, Store, ShoppingCart, PackageSearch } from "lucide-react";
+import { Home, Store, ShoppingCart, PackageSearch, HelpCircle } from "lucide-react";
 import { useCart } from "@/hooks/use-cart";
+import { useTourTrigger } from "@/components/tour-context";
 
 export function MobileNav() {
   const [location] = useLocation();
   const { itemCount } = useCart();
+  const showTour = useTourTrigger();
 
   const navItems = [
     { href: "/", label: "Home", icon: Home },
@@ -37,6 +39,14 @@ export function MobileNav() {
             </Link>
           );
         })}
+        <button
+          type="button"
+          onClick={showTour}
+          className="flex flex-col items-center justify-center w-full h-full space-y-1 text-muted-foreground"
+        >
+          <HelpCircle className="h-5 w-5" />
+          <span className="text-[10px] font-medium">Guide</span>
+        </button>
       </div>
     </div>
   );
