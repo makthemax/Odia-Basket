@@ -1,18 +1,19 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useLocation } from "wouter";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { Loader2, MapPin, Phone, User, CreditCard, Banknote, Smartphone, ShieldCheck, Tag, ArrowLeft, Check } from "lucide-react";
+import { ArrowRight, MapPin, Phone, User, CreditCard, Banknote, Smartphone, ShieldCheck, Tag, ArrowLeft, Check } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
-import { useCreateOrder } from "@workspace/api-client-react";
 import { useCart } from "@/hooks/use-cart";
 import { useToast } from "@/hooks/use-toast";
 import { Link } from "wouter";
+
+const PENDING_KEY = "bg.pendingCheckout";
 
 const LOCALITIES = [
   "Saheed Nagar", "Kharavela Nagar", "Janpath", "Nayapalli",
@@ -39,9 +40,8 @@ type CheckoutForm = z.infer<typeof checkoutSchema>;
 
 export default function Checkout() {
   const [, navigate] = useLocation();
-  const { items, totalPrice, clearCart } = useCart();
+  const { items, totalPrice } = useCart();
   const { toast } = useToast();
-  const createOrder = useCreateOrder();
   const [selectedPayment, setSelectedPayment] = useState<"cod" | "upi" | "card">("cod");
   const [couponApplied, setCouponApplied] = useState(true);
 
@@ -52,10 +52,11 @@ export default function Checkout() {
     defaultValues: { paymentMethod: "cod" },
   });
 
-  if (cartItems.length === 0) {
-    navigate("/cart");
-    return null;
-  }
+  useEffect(() => {
+    if (cartItems.length === 0) navigate("/cart");
+  }, [cartItems.length, navigate]);
+
+  if (cartItems.length === 0) return null;
 
   const itemCount = cartItems.reduce((a, c) => a + c.quantity, 0);
   const totalSavings = cartItems.reduce((acc, { product, quantity }) => {
@@ -69,26 +70,24 @@ export default function Checkout() {
   const grandTotal = Math.max(0, totalPrice + deliveryFee - couponDiscount);
 
   const onSubmit = async (data: CheckoutForm) => {
-    const orderItems = cartItems.map(({ product, quantity }) => ({
-      productId: product.id,
-      quantity,
-      priceAtOrder: product.price,
-    }));
-
     try {
-      const result = await createOrder.mutateAsync({
-        data: {
-          ...data,
+      sessionStorage.setItem(
+        PENDING_KEY,
+        JSON.stringify({
+          customerName: data.customerName,
+          phone: data.phone,
+          address: data.address,
+          locality: data.locality,
+          pincode: data.pincode,
+          notes: data.notes ?? "",
           paymentMethod: selectedPayment,
-          items: orderItems,
-          totalAmount: grandTotal,
-        },
-      });
-
-      clearCart();
-      navigate(`/payment-success?orderId=${result.id}&orderNumber=${result.orderNumber}`);
-    } catch (err) {
-      toast({ title: "Order failed", description: "Please try again.", variant: "destructive" });
+          grandTotal,
+          itemCount,
+        }),
+      );
+      navigate("/payment");
+    } catch {
+      toast({ title: "Could not continue to payment", description: "Please try again.", variant: "destructive" });
     }
   };
 
@@ -304,13 +303,8 @@ export default function Checkout() {
             <Button
               type="submit"
               className="w-full gap-2 h-11 rounded-xl bg-primary hover:bg-primary/90 text-white font-bold shadow-md hidden md:flex"
-              disabled={createOrder.isPending}
             >
-              {createOrder.isPending ? (
-                <><Loader2 className="h-4 w-4 animate-spin" /> Placing order...</>
-              ) : (
-                <>Place Order · ₹{grandTotal.toFixed(0)}</>
-              )}
+              Continue to Pay · ₹{grandTotal.toFixed(0)} <ArrowRight className="h-4 w-4" />
             </Button>
           </div>
 
@@ -330,9 +324,8 @@ export default function Checkout() {
             <Button
               type="submit"
               className="gap-2 h-11 px-5 rounded-xl bg-primary hover:bg-primary/90 text-white font-bold"
-              disabled={createOrder.isPending}
             >
-              {createOrder.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : "Place Order"}
+              Continue <ArrowRight className="h-4 w-4" />
             </Button>
           </div>
         </div>

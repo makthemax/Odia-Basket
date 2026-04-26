@@ -14,6 +14,7 @@ import Checkout from "@/pages/checkout";
 import Orders from "@/pages/orders";
 import OrderTracking from "@/pages/order-tracking";
 import PaymentSuccess from "@/pages/payment-success";
+import Payment from "@/pages/payment";
 
 const queryClient = new QueryClient();
 
@@ -28,6 +29,7 @@ function Router() {
         <Route path="/checkout" component={Checkout} />
         <Route path="/orders" component={Orders} />
         <Route path="/orders/:id" component={OrderTracking} />
+        <Route path="/payment" component={Payment} />
         <Route path="/payment-success" component={PaymentSuccess} />
         <Route component={NotFound} />
       </Switch>
