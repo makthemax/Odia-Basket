@@ -1,7 +1,8 @@
 import { Link, useLocation } from "wouter";
 import { useEffect, useState } from "react";
 import { useCart } from "@/hooks/use-cart";
-import { ShoppingCart, Sprout, MapPin, Search, ChevronDown, Tag } from "lucide-react";
+import { useTourTrigger } from "@/components/tour-context";
+import { ShoppingCart, Sprout, MapPin, Search, ChevronDown, Tag, HelpCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 
@@ -15,6 +16,7 @@ const PROMOS = [
 export function Navbar() {
   const { itemCount, totalPrice } = useCart();
   const [, navigate] = useLocation();
+  const showTour = useTourTrigger();
   const [promoIdx, setPromoIdx] = useState(0);
   const [search, setSearch] = useState("");
 
@@ -81,6 +83,14 @@ export function Navbar() {
           </form>
 
           <nav className="hidden lg:flex items-center gap-1 shrink-0">
+            <button
+              type="button"
+              onClick={showTour}
+              className="text-sm font-semibold hover:text-primary transition-colors px-3 py-2 rounded-lg hover:bg-muted flex items-center gap-1.5"
+            >
+              <HelpCircle className="h-4 w-4" />
+              How it works
+            </button>
             <Link href="/orders" className="text-sm font-semibold hover:text-primary transition-colors px-3 py-2 rounded-lg hover:bg-muted">
               Aaji r Order
             </Link>
