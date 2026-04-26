@@ -8,6 +8,7 @@ import { Separator } from "@/components/ui/separator";
 import { useGetProduct } from "@workspace/api-client-react";
 import { useCart } from "@/hooks/use-cart";
 import { useToast } from "@/hooks/use-toast";
+import { ToastAction } from "@/components/ui/toast";
 import { useLocation } from "wouter";
 import { ProductImage } from "@/components/vegetable-illustrations";
 
@@ -25,7 +26,19 @@ export default function ProductDetail() {
   const handleAddToCart = () => {
     if (!product) return;
     addItem(product, quantity);
-    toast({ title: `${product.name} added to cart`, description: `${quantity} ${product.unit} added. Aapana cart update hela!` });
+    toast({
+      title: `${product.name} added to cart`,
+      description: `${quantity} ${product.unit} added. Aapana cart update hela!`,
+      action: (
+        <ToastAction
+          altText="View cart"
+          onClick={() => navigate("/cart")}
+          className="border-emerald-600 bg-emerald-600 text-white hover:bg-emerald-700 hover:text-white"
+        >
+          View Cart →
+        </ToastAction>
+      ),
+    });
   };
 
   const handleBuyNow = () => {

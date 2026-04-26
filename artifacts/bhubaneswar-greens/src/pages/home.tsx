@@ -6,15 +6,30 @@ import { Badge } from "@/components/ui/badge";
 import { useGetFeaturedProducts, useListCategories, useGetStoreSummary } from "@workspace/api-client-react";
 import { useCart } from "@/hooks/use-cart";
 import { useToast } from "@/hooks/use-toast";
+import { ToastAction } from "@/components/ui/toast";
+import { useLocation } from "wouter";
 import { ProductImage } from "@/components/vegetable-illustrations";
 
 function ProductCard({ product }: { product: any }) {
   const { addItem } = useCart();
   const { toast } = useToast();
+  const [, navigate] = useLocation();
 
   const handleAdd = () => {
     addItem(product);
-    toast({ title: `${product.name} added to cart`, description: "Aapana cart update hela!" });
+    toast({
+      title: `${product.name} added to cart`,
+      description: "Aapana cart update hela!",
+      action: (
+        <ToastAction
+          altText="View cart"
+          onClick={() => navigate("/cart")}
+          className="border-emerald-600 bg-emerald-600 text-white hover:bg-emerald-700 hover:text-white"
+        >
+          View Cart →
+        </ToastAction>
+      ),
+    });
   };
 
   const discount = product.discountPercent ?? 0;
