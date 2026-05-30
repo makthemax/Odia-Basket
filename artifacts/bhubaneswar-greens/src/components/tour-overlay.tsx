@@ -290,12 +290,13 @@ export function useTour() {
   const [open, setOpen] = useState(false);
 
   useEffect(() => {
-    if (typeof window === "undefined") return;
+    if (typeof window === "undefined") return undefined;
     const seen = localStorage.getItem(STORAGE_KEY);
     if (!seen) {
       const t = setTimeout(() => setOpen(true), 700);
       return () => clearTimeout(t);
     }
+    return undefined;
   }, []);
 
   return {

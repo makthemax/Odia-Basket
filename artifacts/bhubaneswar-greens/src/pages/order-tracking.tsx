@@ -17,9 +17,7 @@ const STATUS_ORDER = ["pending", "confirmed", "packed", "out_for_delivery", "del
 
 export default function OrderTracking() {
   const { id } = useParams<{ id: string }>();
-  const { data: order, isLoading } = useGetOrder(Number(id), {
-    query: { enabled: !!id },
-  });
+  const { data: order, isLoading } = useGetOrder(Number(id));
 
   if (isLoading) {
     return (

@@ -1,2 +1,15 @@
 export * from "./generated/api";
-export * from "./generated/types";
+export type {
+  Category,
+  HealthStatus,
+  ListOrdersParams,
+  ListProductsParams,
+  Order,
+  OrderItem,
+  OrderItemInput,
+  OrderStatus,
+  Product,
+  StoreSummary,
+  CreateOrderBodyPaymentMethod,
+  UpdateOrderStatusBodyStatus,
+} from "./generated/types";

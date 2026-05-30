@@ -21,8 +21,7 @@ export default function Orders() {
   const [searchPhone, setSearchPhone] = useState("");
 
   const { data: orders = [], isLoading } = useListOrders(
-    searchPhone ? { phone: searchPhone } : {},
-    { query: { enabled: !!searchPhone } }
+    searchPhone ? { phone: searchPhone } : undefined
   );
 
   const handleSearch = (e: React.FormEvent) => {

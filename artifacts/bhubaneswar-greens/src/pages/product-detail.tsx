@@ -19,9 +19,7 @@ export default function ProductDetail() {
   const { addItem } = useCart();
   const { toast } = useToast();
 
-  const { data: product, isLoading } = useGetProduct(Number(id), {
-    query: { enabled: !!id },
-  });
+  const { data: product, isLoading } = useGetProduct(Number(id));
 
   const handleAddToCart = () => {
     if (!product) return;
@@ -90,7 +88,7 @@ export default function ProductDetail() {
           </div>
           <div className="absolute top-3 left-3 flex flex-col gap-1">
             {product.isSeasonal && <Badge className="bg-amber-500 text-white">Seasonal</Badge>}
-            {product.discountPercent > 0 && <Badge className="bg-primary text-white">{product.discountPercent}% OFF</Badge>}
+            {(product.discountPercent ?? 0) > 0 && <Badge className="bg-primary text-white">{product.discountPercent}% OFF</Badge>}
             {!product.inStock && <Badge variant="destructive">Astock Nahi</Badge>}
           </div>
         </motion.div>
