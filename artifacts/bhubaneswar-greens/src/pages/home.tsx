@@ -1,6 +1,7 @@
 import { Link } from "wouter";
 import { motion } from "framer-motion";
-import { ArrowRight, Sprout, Truck, Star, Clock, Zap, ShieldCheck, BadgePercent, Flame } from "lucide-react";
+import { useRef } from "react";
+import { ArrowRight, Sprout, Truck, Star, Clock, Zap, ShieldCheck, BadgePercent, Flame, ChevronLeft, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { useGetFeaturedProducts, useListCategories, useGetStoreSummary } from "@workspace/api-client-react";
@@ -137,6 +138,72 @@ const DEAL_TILES = [
     emoji: "🌿",
   },
 ];
+
+function FeaturedCarousel({ featured, featuredLoading }: { featured: any[]; featuredLoading: boolean }) {
+  const scrollRef = useRef<HTMLDivElement>(null);
+
+  const scroll = (dir: "left" | "right") => {
+    const el = scrollRef.current;
+    if (!el) return;
+    el.scrollBy({ left: dir === "left" ? -320 : 320, behavior: "smooth" });
+  };
+
+  return (
+    <div>
+      <div className="flex items-end justify-between mb-4">
+        <div>
+          <h2 className="text-lg md:text-xl font-extrabold">Today's Fresh Picks</h2>
+          <p className="text-xs text-muted-foreground mt-0.5">Harvested this morning · Free delivery in 60 mins</p>
+        </div>
+        <div className="flex items-center gap-2">
+          <button
+            type="button"
+            onClick={() => scroll("left")}
+            className="h-8 w-8 rounded-full border border-border bg-background shadow-sm flex items-center justify-center hover:bg-muted transition-colors"
+            aria-label="Scroll left"
+          >
+            <ChevronLeft className="h-4 w-4" />
+          </button>
+          <button
+            type="button"
+            onClick={() => scroll("right")}
+            className="h-8 w-8 rounded-full border border-border bg-background shadow-sm flex items-center justify-center hover:bg-muted transition-colors"
+            aria-label="Scroll right"
+          >
+            <ChevronRight className="h-4 w-4" />
+          </button>
+          <Link href="/products" className="text-xs md:text-sm text-primary font-bold hover:underline ml-1">
+            View all →
+          </Link>
+        </div>
+      </div>
+
+      {featuredLoading ? (
+        <div className="flex gap-4 overflow-hidden">
+          {Array.from({ length: 5 }).map((_, i) => (
+            <div key={i} className="shrink-0 w-44 md:w-52 aspect-[3/4] rounded-2xl bg-muted animate-pulse" />
+          ))}
+        </div>
+      ) : (
+        <div
+          ref={scrollRef}
+          className="flex gap-4 overflow-x-auto scroll-smooth scrollbar-hide pb-2"
+          style={{ scrollSnapType: "x mandatory" }}
+        >
+          {featured.map((product: any) => (
+            <div
+              key={product.id}
+              className="shrink-0 w-44 md:w-52"
+              style={{ scrollSnapAlign: "start" }}
+            >
+              <ProductCard product={product} />
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
 
 export default function Home() {
   const { data: featured = [], isLoading: featuredLoading } = useGetFeaturedProducts();
@@ -292,29 +359,8 @@ export default function Home() {
         </Link>
       </div>
 
-      {/* Featured Products */}
-      <div>
-        <div className="flex items-end justify-between mb-4">
-          <div>
-            <h2 className="text-lg md:text-xl font-extrabold">Today's Fresh Picks</h2>
-            <p className="text-xs text-muted-foreground mt-0.5">Harvested this morning · Free delivery in 60 mins</p>
-          </div>
-          <Link href="/products" className="text-xs md:text-sm text-primary font-bold hover:underline">View all →</Link>
-        </div>
-        {featuredLoading ? (
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            {Array.from({ length: 4 }).map((_, i) => (
-              <div key={i} className="aspect-[3/4] rounded-2xl bg-muted animate-pulse" />
-            ))}
-          </div>
-        ) : (
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4">
-            {featured.slice(0, 8).map((product: any) => (
-              <ProductCard key={product.id} product={product} />
-            ))}
-          </div>
-        )}
-      </div>
+      {/* Featured Products Carousel */}
+      <FeaturedCarousel featured={featured} featuredLoading={featuredLoading} />
 
       {/* Delivery Areas */}
       {summary && (
