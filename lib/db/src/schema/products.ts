@@ -19,6 +19,8 @@ export const productsTable = pgTable("products", {
   farmName: text("farm_name"),
   origin: text("origin"),
   isComingSoon: boolean("is_coming_soon").notNull().default(false),
+  isOrganic: boolean("is_organic").notNull().default(false),
+  parentProductId: integer("parent_product_id"),
 });
 
 export const insertProductSchema = createInsertSchema(productsTable).omit({ id: true });

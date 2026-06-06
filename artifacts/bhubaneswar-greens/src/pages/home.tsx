@@ -1,7 +1,7 @@
 import { Link } from "wouter";
 import { motion } from "framer-motion";
 import { useRef, useState } from "react";
-import { ArrowRight, Sprout, Truck, Star, Clock, Zap, ShieldCheck, BadgePercent, Flame, ChevronLeft, ChevronRight, Leaf, Bell } from "lucide-react";
+import { ArrowRight, Sprout, Truck, Star, Clock, Zap, ShieldCheck, BadgePercent, Flame, ChevronLeft, ChevronRight, Leaf } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Switch } from "@/components/ui/switch";
@@ -12,26 +12,34 @@ import { ToastAction } from "@/components/ui/toast";
 import { useLocation } from "wouter";
 import { ProductImage } from "@/components/vegetable-illustrations";
 
-const ORGANIC_PREMIUM = 0.18; // 18% premium for certified organic
-
 function ProductCard({ product }: { product: any }) {
   const { addItem } = useCart();
   const { toast } = useToast();
   const [, navigate] = useLocation();
   const [isOrganic, setIsOrganic] = useState(false);
 
-  const basePrice = parseFloat(product.price);
-  const displayPrice = isOrganic ? Math.round(basePrice * (1 + ORGANIC_PREMIUM)) : basePrice;
+  const organicVariant = product.organicVariant ?? null;
+  const hasOrganic = organicVariant !== null;
+
+  const displayPrice = isOrganic && hasOrganic ? organicVariant.price : parseFloat(product.price);
+  const activeIsComingSoon = isOrganic && hasOrganic
+    ? organicVariant.isComingSoon
+    : product.isComingSoon;
 
   const discount = product.discountPercent ?? 0;
-  const mrp = discount > 0 ? Math.round(basePrice / (1 - discount / 100)) : null;
-  const organicMrp = mrp ? Math.round(mrp * (1 + ORGANIC_PREMIUM)) : null;
+  const basePrice = parseFloat(product.price);
+  const mrp = !isOrganic && discount > 0 ? Math.round(basePrice / (1 - discount / 100)) : null;
 
   const rating = (4.0 + ((product.id * 7) % 10) / 10).toFixed(1);
   const ratingCount = 80 + ((product.id * 31) % 900);
 
+  const cartProductId = isOrganic && hasOrganic ? organicVariant.id : product.id;
+  const cartProduct = isOrganic && hasOrganic
+    ? { ...product, id: organicVariant.id, price: organicVariant.price, name: `${product.name} (Organic)` }
+    : product;
+
   const handleAdd = () => {
-    addItem({ ...product, price: displayPrice });
+    addItem({ ...cartProduct, price: displayPrice });
     toast({
       title: `${product.name}${isOrganic ? " (Organic)" : ""} added to cart`,
       description: "Aapana cart update hela!",
@@ -64,28 +72,30 @@ function ProductCard({ product }: { product: any }) {
           imgClassName="w-full h-full object-cover transition-transform hover:scale-105 duration-300"
         />
 
-        {discount > 0 && product.inStock && (
+        {discount > 0 && !isOrganic && product.inStock && !product.isComingSoon && (
           <div className="absolute top-0 left-0 bg-secondary text-white text-[10px] font-bold px-2 py-1 rounded-br-lg shadow">
             {discount}% OFF
           </div>
         )}
-        {product.isSeasonal && (
+        {product.isSeasonal && !activeIsComingSoon && (
           <Badge className="absolute top-2 right-2 bg-amber-500 text-white text-[10px] gap-1 border-0 shadow">
             <Flame className="h-3 w-3" /> Seasonal
           </Badge>
         )}
-        {isOrganic && !product.isComingSoon && (
+        {isOrganic && hasOrganic && !activeIsComingSoon && (
           <div className="absolute bottom-0 left-0 right-0 bg-emerald-700/80 text-white text-[10px] font-bold px-2 py-1 flex items-center gap-1">
             <Leaf className="h-2.5 w-2.5" /> Pesticide-Free · FSSAI Organic
           </div>
         )}
-        {product.isComingSoon && (
+        {activeIsComingSoon && (
           <div className="absolute inset-0 bg-gradient-to-b from-slate-900/55 to-slate-900/80 flex flex-col items-center justify-center gap-1.5">
             <Clock className="h-6 w-6 text-white" />
-            <Badge className="bg-white text-slate-800 font-bold text-[10px] border-0 shadow">Coming Soon</Badge>
+            <Badge className="bg-white text-slate-800 font-bold text-[10px] border-0 shadow">
+              {isOrganic ? "Organic Coming Soon" : "Coming Soon"}
+            </Badge>
           </div>
         )}
-        {!product.inStock && !product.isComingSoon && (
+        {!product.inStock && !activeIsComingSoon && (
           <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
             <Badge variant="destructive">Astock Nahi</Badge>
           </div>
@@ -98,7 +108,7 @@ function ProductCard({ product }: { product: any }) {
             {rating} <Star className="h-2.5 w-2.5 fill-white" />
           </span>
           <span className="text-[10px] text-muted-foreground">({ratingCount})</span>
-          {isOrganic && (
+          {isOrganic && hasOrganic && (
             <Badge className="ml-auto bg-emerald-600 text-white border-0 text-[9px] px-1.5 py-0 h-4 gap-0.5">
               <Leaf className="h-2 w-2" /> Organic
             </Badge>
@@ -119,7 +129,7 @@ function ProductCard({ product }: { product: any }) {
         >
           <span className={`text-[10px] font-bold flex items-center gap-1 ${isOrganic ? "text-emerald-700" : "text-muted-foreground"}`}>
             <Leaf className="h-3 w-3" />
-            {isOrganic ? "Organic ON" : "Organic"}
+            {isOrganic ? `Organic #${cartProductId}` : "Organic"}
           </span>
           <Switch
             checked={isOrganic}
@@ -130,26 +140,22 @@ function ProductCard({ product }: { product: any }) {
 
         <div className="mt-2 flex items-center gap-1.5">
           <motion.span
-            key={displayPrice}
+            key={`${displayPrice}-${isOrganic}`}
             initial={{ scale: 0.85, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
             className={`text-base font-extrabold ${isOrganic ? "text-emerald-700" : "text-foreground"}`}
           >
             ₹{displayPrice}
           </motion.span>
-          {isOrganic && organicMrp ? (
-            <>
-              <span className="text-xs text-muted-foreground line-through">₹{organicMrp}</span>
-              <span className="text-[10px] font-bold text-secondary">SAVE ₹{organicMrp - displayPrice}</span>
-            </>
-          ) : !isOrganic && mrp ? (
+          {!isOrganic && mrp && (
             <>
               <span className="text-xs text-muted-foreground line-through">₹{mrp}</span>
               <span className="text-[10px] font-bold text-secondary">SAVE ₹{mrp - displayPrice}</span>
             </>
-          ) : isOrganic ? (
-            <span className="text-[10px] text-emerald-600 font-semibold">+18% organic premium</span>
-          ) : null}
+          )}
+          {isOrganic && hasOrganic && (
+            <span className="text-[10px] text-emerald-600 font-semibold">Certified Organic</span>
+          )}
         </div>
 
         <div className="mt-1 flex items-center gap-1 text-[10px] text-emerald-700">
@@ -157,11 +163,13 @@ function ProductCard({ product }: { product: any }) {
         </div>
 
         <div className="mt-2.5">
-          {product.isComingSoon ? (
+          {activeIsComingSoon ? (
             <Button size="sm" disabled variant="outline" className="w-full h-8 text-xs font-bold border-slate-300 text-slate-500 gap-1.5">
               <Clock className="h-3 w-3" /> Coming Soon
             </Button>
-          ) : product.inStock ? (
+          ) : !product.inStock ? (
+            <Button size="sm" disabled variant="outline" className="w-full h-8 text-xs">Out of stock</Button>
+          ) : (
             <Button
               size="sm"
               onClick={handleAdd}
@@ -174,8 +182,6 @@ function ProductCard({ product }: { product: any }) {
             >
               {isOrganic ? "ADD ORGANIC" : "ADD"}
             </Button>
-          ) : (
-            <Button size="sm" disabled variant="outline" className="w-full h-8 text-xs">Out of stock</Button>
           )}
         </div>
       </div>
@@ -321,7 +327,7 @@ export default function Home() {
         <VeggieIllustration className="hidden sm:block absolute right-2 md:right-8 bottom-0 h-48 md:h-64 w-auto" />
       </motion.div>
 
-      {/* Deal Tiles - desi promo banner row */}
+      {/* Deal Tiles */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
         {DEAL_TILES.map((d) => (
           <Link key={d.title} href={d.href}>
@@ -362,7 +368,7 @@ export default function Home() {
         ))}
       </div>
 
-      {/* Categories - BigBasket-style colorful tiles */}
+      {/* Categories */}
       <div>
         <div className="flex items-end justify-between mb-4">
           <div>
@@ -490,120 +496,47 @@ function VeggieIllustration({ className }: { className?: string }) {
       aria-hidden="true"
     >
       <ellipse cx="160" cy="248" rx="140" ry="14" fill="#000" opacity="0.12" />
-
       <g>
-        <path
-          d="M70 200c-22-6-36-26-32-50 4-22 24-36 46-32 6-20 28-30 48-22 14-12 36-12 50 2 18-4 36 8 40 26 16 4 26 22 22 38-4 18-22 30-40 28-2 18-20 30-38 26-10 14-30 18-44 8-14 8-34 4-44-8-2 0-4 0-8-2"
-          fill="#65a30d"
-        />
-        <path
-          d="M82 168c14-2 24 6 32 16M120 150c10 4 18 14 20 26M170 142c-2 14 6 26 18 32M210 158c-4 12 2 26 14 32"
-          stroke="#3f6212"
-          strokeWidth="2"
-          strokeLinecap="round"
-          opacity="0.5"
-        />
+        <path d="M70 200c-22-6-36-26-32-50 4-22 24-36 46-32 6-20 28-30 48-22 14-12 36-12 50 2 18-4 36 8 40 26 16 4 26 22 22 38-4 18-22 30-40 28-2 18-20 30-38 26-10 14-30 18-44 8-14 8-34 4-44-8-2 0-4 0-8-2" fill="#65a30d" />
+        <path d="M82 168c14-2 24 6 32 16M120 150c10 4 18 14 20 26M170 142c-2 14 6 26 18 32M210 158c-4 12 2 26 14 32" stroke="#3f6212" strokeWidth="2" strokeLinecap="round" opacity="0.5" />
       </g>
-
       <g>
-        <path
-          d="M126 196c-2-22 12-42 32-44 22-2 42 14 44 36 2 22-14 42-36 44-22 2-38-14-40-36z"
-          fill="#dc2626"
-        />
-        <path
-          d="M126 196c-1-12 4-24 12-32 2 14 8 26 18 34-12 4-22 4-30-2z"
-          fill="#ef4444"
-        />
-        <path
-          d="M158 156c0-6-2-10-6-14 6-2 12-2 16 2 4-2 8-2 12 0-2 6-6 10-12 12"
-          fill="#16a34a"
-        />
+        <path d="M126 196c-2-22 12-42 32-44 22-2 42 14 44 36 2 22-14 42-36 44-22 2-38-14-40-36z" fill="#dc2626" />
+        <path d="M126 196c-1-12 4-24 12-32 2 14 8 26 18 34-12 4-22 4-30-2z" fill="#ef4444" />
+        <path d="M158 156c0-6-2-10-6-14 6-2 12-2 16 2 4-2 8-2 12 0-2 6-6 10-12 12" fill="#16a34a" />
         <ellipse cx="148" cy="178" rx="6" ry="4" fill="#fca5a5" opacity="0.7" />
       </g>
-
       <g>
-        <path
-          d="M218 220c-14-4-22-18-18-32 2-8 8-14 16-16-2-12 6-22 18-22 4-10 14-16 24-12 8-12 24-12 32 0 12-2 22 8 22 20 8 4 12 14 8 22 4 10-2 22-12 26-2 10-12 16-22 14-6 8-18 10-26 4-8 8-22 6-30-2-4 2-8 2-12-2z"
-          fill="#f97316"
-        />
-        <path
-          d="M260 162c0-8-4-14-10-18 8-4 16-2 22 4 6-4 14-2 18 4-2 8-10 14-18 14"
-          fill="#16a34a"
-        />
+        <path d="M218 220c-14-4-22-18-18-32 2-8 8-14 16-16-2-12 6-22 18-22 4-10 14-16 24-12 8-12 24-12 32 0 12-2 22 8 22 20 8 4 12 14 8 22 4 10-2 22-12 26-2 10-12 16-22 14-6 8-18 10-26 4-8 8-22 6-30-2-4 2-8 2-12-2z" fill="#f97316" />
+        <path d="M260 162c0-8-4-14-10-18 8-4 16-2 22 4 6-4 14-2 18 4-2 8-10 14-18 14" fill="#16a34a" />
       </g>
-
       <g>
         <ellipse cx="80" cy="222" rx="34" ry="22" fill="#7c2d12" />
         <ellipse cx="80" cy="218" rx="34" ry="22" fill="#a16207" />
-        <path
-          d="M62 210c4-4 10-6 16-4M86 206c6 0 12 2 16 6M70 224c4 2 10 2 14 0"
-          stroke="#78350f"
-          strokeWidth="1.5"
-          strokeLinecap="round"
-          opacity="0.6"
-        />
-        <path
-          d="M76 196c-2-6 0-12 4-16 4 4 6 10 4 16"
-          fill="#16a34a"
-          stroke="#166534"
-          strokeWidth="1"
-        />
+        <path d="M62 210c4-4 10-6 16-4M86 206c6 0 12 2 16 6M70 224c4 2 10 2 14 0" stroke="#78350f" strokeWidth="1.5" strokeLinecap="round" opacity="0.6" />
+        <path d="M76 196c-2-6 0-12 4-16 4 4 6 10 4 16" fill="#16a34a" stroke="#166534" strokeWidth="1" />
       </g>
-
       <g>
-        <path
-          d="M40 240c10-2 18-12 18-22 0-12-10-22-22-22-8 0-14 4-18 10 0 0-2 18 6 28s16 6 16 6z"
-          fill="#fb923c"
-        />
-        <path
-          d="M40 196c-2-6-2-12 2-16 6-2 12 2 14 8"
-          stroke="#16a34a"
-          strokeWidth="3"
-          strokeLinecap="round"
-          fill="none"
-        />
+        <path d="M40 240c10-2 18-12 18-22 0-12-10-22-22-22-8 0-14 4-18 10 0 0-2 18 6 28s16 6 16 6z" fill="#fb923c" />
+        <path d="M40 196c-2-6-2-12 2-16 6-2 12 2 14 8" stroke="#16a34a" strokeWidth="3" strokeLinecap="round" fill="none" />
       </g>
-
       <g>
-        <path
-          d="M270 232c12-4 18-18 14-30-4-12-18-18-30-12-4 2-8 6-10 10 0 0-4 14 6 24s20 8 20 8z"
-          fill="#facc15"
-        />
+        <path d="M270 232c12-4 18-18 14-30-4-12-18-18-30-12-4 2-8 6-10 10 0 0-4 14 6 24s20 8 20 8z" fill="#facc15" />
         <path d="M278 198c2-6 0-12-4-16" stroke="#16a34a" strokeWidth="3" strokeLinecap="round" fill="none" />
       </g>
-
       <g>
         <circle cx="118" cy="232" r="14" fill="#dc2626" />
         <circle cx="114" cy="228" r="4" fill="#fca5a5" opacity="0.8" />
         <path d="M118 218c0-4 2-6 6-8" stroke="#16a34a" strokeWidth="2" strokeLinecap="round" fill="none" />
-
         <circle cx="148" cy="240" r="10" fill="#dc2626" />
         <circle cx="146" cy="238" r="3" fill="#fca5a5" opacity="0.8" />
-
         <circle cx="200" cy="244" r="12" fill="#dc2626" />
         <circle cx="197" cy="241" r="3.5" fill="#fca5a5" opacity="0.8" />
       </g>
-
       <g>
-        <path
-          d="M232 246c-14-2-22-16-20-30 2-12 10-22 20-26 4-2 8-2 12 0 6-4 14-2 18 4 6 6 8 16 6 24-2 14-12 26-26 28-4 0-8 0-10 0z"
-          fill="#4c1d95"
-        />
-        <path
-          d="M232 218c-4-6 2-14 10-12-4 4-6 8-4 12 4-2 8-2 10 2-6 0-10 4-12 8-2-4-2-8-4-10z"
-          fill="#16a34a"
-          stroke="#166534"
-          strokeWidth="1"
-        />
-        <ellipse
-          cx="240"
-          cy="232"
-          rx="3"
-          ry="8"
-          fill="#7c3aed"
-          opacity="0.5"
-          transform="rotate(-20 240 232)"
-        />
+        <path d="M232 246c-14-2-22-16-20-30 2-12 10-22 20-26 4-2 8-2 12 0 6-4 14-2 18 4 6 6 8 16 6 24-2 14-12 26-26 28-4 0-8 0-10 0z" fill="#4c1d95" />
+        <path d="M232 218c-4-6 2-14 10-12-4 4-6 8-4 12 4-2 8-2 10 2-6 0-10 4-12 8-2-4-2-8-4-10z" fill="#16a34a" stroke="#166534" strokeWidth="1" />
+        <ellipse cx="240" cy="232" rx="3" ry="8" fill="#7c3aed" opacity="0.5" transform="rotate(-20 240 232)" />
       </g>
     </svg>
   );

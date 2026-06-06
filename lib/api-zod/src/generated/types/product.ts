@@ -5,6 +5,7 @@
  * Bhubaneswar Greens - Organic Delivery API
  * OpenAPI spec version: 0.1.0
  */
+import type { OrganicVariant } from "./organicVariant";
 
 export interface Product {
   id: number;
@@ -23,4 +24,7 @@ export interface Product {
   farmName?: string;
   origin?: string;
   isComingSoon: boolean;
+  isOrganic: boolean;
+  parentProductId?: number | null;
+  organicVariant?: OrganicVariant | null;
 }

@@ -1,6 +1,6 @@
 import { Router, type IRouter } from "express";
 import { db, productsTable } from "@workspace/db";
-import { eq, ilike, and, type SQL } from "drizzle-orm";
+import { eq, ilike, and, inArray, isNull, type SQL } from "drizzle-orm";
 import {
   ListProductsQueryParams,
   ListProductsResponse,
@@ -15,13 +15,42 @@ function normalizeProduct(p: any) {
   return { ...p, price: Number(p.price) };
 }
 
-router.get("/products/featured", async (_req, res): Promise<void> => {
-  const products = await db
+async function embedOrganicVariants(products: any[]): Promise<any[]> {
+  if (products.length === 0) return [];
+  const ids = products.map((p) => p.id);
+  const variants = await db
     .select()
     .from(productsTable)
-    .where(eq(productsTable.isFeatured, true))
+    .where(
+      and(
+        eq(productsTable.isOrganic, true),
+        inArray(productsTable.parentProductId, ids)
+      )
+    );
+  const byParent: Record<number, any> = {};
+  for (const v of variants) {
+    if (v.parentProductId != null) {
+      byParent[v.parentProductId] = {
+        id: v.id,
+        price: Number(v.price),
+        isComingSoon: v.isComingSoon,
+      };
+    }
+  }
+  return products.map((p) => ({
+    ...p,
+    organicVariant: byParent[p.id] ?? null,
+  }));
+}
+
+router.get("/products/featured", async (_req, res): Promise<void> => {
+  const rows = await db
+    .select()
+    .from(productsTable)
+    .where(and(eq(productsTable.isFeatured, true), eq(productsTable.isOrganic, false)))
     .limit(12);
-  res.json(GetFeaturedProductsResponse.parse(products.map(normalizeProduct)));
+  const products = await embedOrganicVariants(rows.map(normalizeProduct));
+  res.json(GetFeaturedProductsResponse.parse(products));
 });
 
 router.get("/products", async (req, res): Promise<void> => {
@@ -32,7 +61,7 @@ router.get("/products", async (req, res): Promise<void> => {
   }
 
   const { categoryId, search, featured } = parsed.data;
-  const conditions: SQL[] = [];
+  const conditions: SQL[] = [eq(productsTable.isOrganic, false)];
 
   if (categoryId != null) {
     conditions.push(eq(productsTable.categoryId, Number(categoryId)));
@@ -44,11 +73,14 @@ router.get("/products", async (req, res): Promise<void> => {
     conditions.push(eq(productsTable.isFeatured, true));
   }
 
-  const products = conditions.length > 0
-    ? await db.select().from(productsTable).where(and(...conditions)).orderBy(productsTable.id)
-    : await db.select().from(productsTable).orderBy(productsTable.id);
+  const rows = await db
+    .select()
+    .from(productsTable)
+    .where(and(...conditions))
+    .orderBy(productsTable.id);
 
-  res.json(ListProductsResponse.parse(products.map(normalizeProduct)));
+  const products = await embedOrganicVariants(rows.map(normalizeProduct));
+  res.json(ListProductsResponse.parse(products));
 });
 
 router.get("/products/:id", async (req, res): Promise<void> => {
@@ -69,7 +101,14 @@ router.get("/products/:id", async (req, res): Promise<void> => {
     return;
   }
 
-  res.json(GetProductResponse.parse(normalizeProduct(product)));
+  const normalized = normalizeProduct(product);
+
+  if (!normalized.isOrganic) {
+    const [embedded] = await embedOrganicVariants([normalized]);
+    res.json(GetProductResponse.parse(embedded));
+  } else {
+    res.json(GetProductResponse.parse({ ...normalized, organicVariant: null }));
+  }
 });
 
 export default router;

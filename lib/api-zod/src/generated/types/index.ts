@@ -16,6 +16,7 @@ export * from "./order";
 export * from "./orderItem";
 export * from "./orderItemInput";
 export * from "./orderStatus";
+export * from "./organicVariant";
 export * from "./product";
 export * from "./storeSummary";
 export * from "./updateOrderStatusBody";

@@ -212,6 +212,20 @@ paths:
 
 components:
   schemas:
+    OrganicVariant:
+      type: object
+      properties:
+        id:
+          type: integer
+        price:
+          type: number
+        isComingSoon:
+          type: boolean
+      required:
+        - id
+        - price
+        - isComingSoon
+
     HealthStatus:
       type: object
       properties:
@@ -276,6 +290,15 @@ components:
           type: string
         isComingSoon:
           type: boolean
+        isOrganic:
+          type: boolean
+        parentProductId:
+          type: integer
+          nullable: true
+        organicVariant:
+          oneOf:
+            - $ref: "#/components/schemas/OrganicVariant"
+            - type: "null"
       required:
         - id
         - name
@@ -286,6 +309,7 @@ components:
         - isFeatured
         - isSeasonal
         - isComingSoon
+        - isOrganic
 
     CreateOrderBody:
       type: object

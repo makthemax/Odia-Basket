@@ -1,10 +1,11 @@
 import { useState } from "react";
 import { useSearch } from "wouter";
 import { motion, AnimatePresence } from "framer-motion";
-import { Search, X, Star, Zap, Flame, SlidersHorizontal, Sprout, Clock, Bell } from "lucide-react";
+import { Search, X, Star, Zap, Flame, SlidersHorizontal, Sprout, Clock, Leaf } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { Switch } from "@/components/ui/switch";
 import { useListProducts, useListCategories } from "@workspace/api-client-react";
 import { useCart } from "@/hooks/use-cart";
 import { useToast } from "@/hooks/use-toast";
@@ -16,12 +17,34 @@ function ProductCard({ product }: { product: any }) {
   const { addItem, items, updateQuantity } = useCart();
   const [, navigate] = useLocation();
   const { toast } = useToast();
-  const inCart = items[product.id]?.quantity ?? 0;
+  const [isOrganic, setIsOrganic] = useState(false);
+
+  const organicVariant = product.organicVariant ?? null;
+  const hasOrganic = organicVariant !== null;
+
+  const displayPrice = isOrganic && hasOrganic ? organicVariant.price : parseFloat(product.price);
+  const activeIsComingSoon = isOrganic && hasOrganic
+    ? organicVariant.isComingSoon
+    : product.isComingSoon;
+
+  const discount = product.discountPercent ?? 0;
+  const basePrice = parseFloat(product.price);
+  const mrp = !isOrganic && discount > 0 ? Math.round(basePrice / (1 - discount / 100)) : null;
+
+  const rating = (4.0 + ((product.id * 7) % 10) / 10).toFixed(1);
+  const ratingCount = 80 + ((product.id * 31) % 900);
+
+  const activeId = isOrganic && hasOrganic ? organicVariant.id : product.id;
+  const inCart = items[activeId]?.quantity ?? 0;
+
+  const cartProduct = isOrganic && hasOrganic
+    ? { ...product, id: organicVariant.id, price: organicVariant.price, name: `${product.name} (Organic)` }
+    : product;
 
   const handleAdd = () => {
-    addItem(product);
+    addItem({ ...cartProduct, price: displayPrice });
     toast({
-      title: `${product.name} added!`,
+      title: `${product.name}${isOrganic ? " (Organic)" : ""} added!`,
       description: "Aapana cart update hela!",
       action: (
         <ToastAction
@@ -35,11 +58,6 @@ function ProductCard({ product }: { product: any }) {
     });
   };
 
-  const discount = product.discountPercent ?? 0;
-  const mrp = discount > 0 ? Math.round(product.price / (1 - discount / 100)) : null;
-  const rating = (4.0 + ((product.id * 7) % 10) / 10).toFixed(1);
-  const ratingCount = 80 + ((product.id * 31) % 900);
-
   return (
     <motion.div
       layout
@@ -47,62 +65,104 @@ function ProductCard({ product }: { product: any }) {
       animate={{ opacity: 1, scale: 1 }}
       exit={{ opacity: 0, scale: 0.95 }}
       whileHover={{ y: -3 }}
-      className="bg-card rounded-2xl overflow-hidden border border-card-border shadow-sm hover:shadow-md transition-shadow flex flex-col"
+      className={`rounded-2xl overflow-hidden border shadow-sm hover:shadow-md transition-all flex flex-col ${
+        isOrganic ? "bg-emerald-50 border-emerald-300 ring-1 ring-emerald-200" : "bg-card border-card-border"
+      }`}
     >
-      <Link href={`/products/${product.id}`}>
+      <Link href={`/products/${isOrganic && hasOrganic ? organicVariant.id : product.id}`}>
         <div className="relative aspect-[4/3] overflow-hidden bg-muted">
           <ProductImage
             product={product}
             className="w-full h-full"
             imgClassName="w-full h-full object-cover transition-transform hover:scale-105 duration-300"
           />
-
-          {discount > 0 && product.inStock && (
+          {discount > 0 && !isOrganic && product.inStock && !product.isComingSoon && (
             <div className="absolute top-0 left-0 bg-secondary text-white text-[10px] font-bold px-2 py-1 rounded-br-lg shadow">
               {discount}% OFF
             </div>
           )}
-          {product.isSeasonal && (
+          {product.isSeasonal && !activeIsComingSoon && (
             <Badge className="absolute top-2 right-2 bg-amber-500 text-white text-[10px] gap-1 border-0 shadow">
               <Flame className="h-3 w-3" /> Seasonal
             </Badge>
           )}
-          {product.isComingSoon && (
-            <div className="absolute inset-0 bg-gradient-to-b from-slate-900/60 to-slate-900/80 flex flex-col items-center justify-center gap-2">
-              <Clock className="h-7 w-7 text-white" />
-              <Badge className="bg-white text-slate-800 font-bold text-xs border-0 shadow-md">Coming Soon</Badge>
+          {isOrganic && hasOrganic && !activeIsComingSoon && (
+            <div className="absolute bottom-0 left-0 right-0 bg-emerald-700/80 text-white text-[10px] font-bold px-2 py-1 flex items-center gap-1">
+              <Leaf className="h-2.5 w-2.5" /> Pesticide-Free · FSSAI Organic
             </div>
           )}
-          {!product.inStock && !product.isComingSoon && (
+          {activeIsComingSoon && (
+            <div className="absolute inset-0 bg-gradient-to-b from-slate-900/60 to-slate-900/80 flex flex-col items-center justify-center gap-2">
+              <Clock className="h-7 w-7 text-white" />
+              <Badge className="bg-white text-slate-800 font-bold text-xs border-0 shadow-md">
+                {isOrganic ? "Organic Coming Soon" : "Coming Soon"}
+              </Badge>
+            </div>
+          )}
+          {!product.inStock && !activeIsComingSoon && (
             <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
               <Badge variant="destructive" className="text-sm">Astock Nahi</Badge>
             </div>
           )}
         </div>
       </Link>
+
       <div className="p-3 flex flex-col flex-1">
         <div className="flex items-center gap-1.5 mb-1">
           <span className="inline-flex items-center gap-0.5 bg-emerald-600 text-white text-[10px] font-bold px-1.5 py-0.5 rounded">
             {rating} <Star className="h-2.5 w-2.5 fill-white" />
           </span>
           <span className="text-[10px] text-muted-foreground">({ratingCount})</span>
+          {isOrganic && hasOrganic && (
+            <Badge className="ml-auto bg-emerald-600 text-white border-0 text-[9px] px-1.5 py-0 h-4 gap-0.5">
+              <Leaf className="h-2 w-2" /> Organic
+            </Badge>
+          )}
         </div>
+
         <p className="text-[11px] text-muted-foreground font-medium truncate">{product.nameOdia}</p>
-        <Link href={`/products/${product.id}`}>
+        <Link href={`/products/${isOrganic && hasOrganic ? organicVariant.id : product.id}`}>
           <h3 className="font-semibold text-sm leading-tight line-clamp-1 hover:text-primary transition-colors">{product.name}</h3>
         </Link>
         {product.farmName && (
           <p className="text-[10px] text-muted-foreground mt-0.5 truncate">📍 {product.farmName}</p>
         )}
-        <p className="text-[10px] text-muted-foreground mt-0.5">{product.unit}</p>
+        <p className="text-[10px] text-muted-foreground mt-0.5">
+          {isOrganic ? `${product.unit} · Zero pesticides` : product.unit}
+        </p>
+
+        {/* Organic toggle */}
+        <div className={`mt-2 flex items-center justify-between rounded-lg px-2 py-1.5 transition-colors ${
+          isOrganic ? "bg-emerald-100 border border-emerald-300" : "bg-muted/60 border border-border"
+        }`}>
+          <span className={`text-[10px] font-bold flex items-center gap-1 ${isOrganic ? "text-emerald-700" : "text-muted-foreground"}`}>
+            <Leaf className="h-3 w-3" />
+            {isOrganic ? `Organic #${activeId}` : "Organic"}
+          </span>
+          <Switch
+            checked={isOrganic}
+            onCheckedChange={setIsOrganic}
+            className="scale-75 data-[state=checked]:bg-emerald-600"
+          />
+        </div>
 
         <div className="mt-2 flex items-center gap-1.5">
-          <span className="text-base font-extrabold text-foreground">₹{product.price}</span>
-          {mrp && (
+          <motion.span
+            key={`${displayPrice}-${isOrganic}`}
+            initial={{ scale: 0.85, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            className={`text-base font-extrabold ${isOrganic ? "text-emerald-700" : "text-foreground"}`}
+          >
+            ₹{displayPrice}
+          </motion.span>
+          {!isOrganic && mrp && (
             <>
               <span className="text-xs text-muted-foreground line-through">₹{mrp}</span>
-              <span className="text-[10px] font-bold text-secondary">SAVE ₹{mrp - product.price}</span>
+              <span className="text-[10px] font-bold text-secondary">SAVE ₹{mrp - displayPrice}</span>
             </>
+          )}
+          {isOrganic && hasOrganic && (
+            <span className="text-[10px] text-emerald-600 font-semibold">Certified Organic</span>
           )}
         </div>
 
@@ -111,23 +171,23 @@ function ProductCard({ product }: { product: any }) {
         </div>
 
         <div className="mt-2.5">
-          {product.isComingSoon ? (
-            <Button size="sm" variant="outline" className="w-full h-9 text-xs font-bold border-slate-300 text-slate-600 hover:bg-slate-100 gap-1.5" disabled>
-              <Bell className="h-3.5 w-3.5" /> Coming Soon
+          {activeIsComingSoon ? (
+            <Button size="sm" disabled variant="outline" className="w-full h-9 text-xs font-bold border-slate-300 text-slate-500 gap-1.5">
+              <Clock className="h-3.5 w-3.5" /> Coming Soon
             </Button>
           ) : !product.inStock ? (
             <Button size="sm" disabled variant="outline" className="w-full h-9 text-xs">Out of stock</Button>
           ) : inCart > 0 ? (
-            <div className="flex items-center justify-between gap-1 bg-secondary text-white rounded-lg h-9 px-1">
+            <div className={`flex items-center justify-between gap-1 rounded-lg h-9 px-1 ${isOrganic ? "bg-emerald-600" : "bg-secondary"} text-white`}>
               <button
-                onClick={() => updateQuantity(product.id, inCart - 1)}
+                onClick={() => updateQuantity(activeId, inCart - 1)}
                 className="h-7 w-8 rounded-md hover:bg-white/15 font-bold text-base transition-colors"
               >
                 −
               </button>
               <span className="text-sm font-bold">{inCart}</span>
               <button
-                onClick={() => updateQuantity(product.id, inCart + 1)}
+                onClick={() => updateQuantity(activeId, inCart + 1)}
                 className="h-7 w-8 rounded-md hover:bg-white/15 font-bold text-base transition-colors"
               >
                 +
@@ -138,9 +198,13 @@ function ProductCard({ product }: { product: any }) {
               size="sm"
               onClick={handleAdd}
               variant="outline"
-              className="w-full h-9 text-xs font-bold border-secondary/40 text-secondary hover:bg-secondary hover:text-white"
+              className={`w-full h-9 text-xs font-bold transition-colors ${
+                isOrganic
+                  ? "border-emerald-500 text-emerald-700 hover:bg-emerald-600 hover:text-white bg-emerald-50"
+                  : "border-secondary/40 text-secondary hover:bg-secondary hover:text-white"
+              }`}
             >
-              ADD
+              {isOrganic ? "ADD ORGANIC" : "ADD"}
             </Button>
           )}
         </div>

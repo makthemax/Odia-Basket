@@ -53,6 +53,18 @@ export const ListProductsResponseItem = zod.object({
   farmName: zod.string().optional(),
   origin: zod.string().optional(),
   isComingSoon: zod.boolean(),
+  isOrganic: zod.boolean(),
+  parentProductId: zod.number().nullish(),
+  organicVariant: zod
+    .union([
+      zod.object({
+        id: zod.number(),
+        price: zod.number(),
+        isComingSoon: zod.boolean(),
+      }),
+      zod.null(),
+    ])
+    .optional(),
 });
 export const ListProductsResponse = zod.array(ListProductsResponseItem);
 
@@ -80,6 +92,18 @@ export const GetProductResponse = zod.object({
   farmName: zod.string().optional(),
   origin: zod.string().optional(),
   isComingSoon: zod.boolean(),
+  isOrganic: zod.boolean(),
+  parentProductId: zod.number().nullish(),
+  organicVariant: zod
+    .union([
+      zod.object({
+        id: zod.number(),
+        price: zod.number(),
+        isComingSoon: zod.boolean(),
+      }),
+      zod.null(),
+    ])
+    .optional(),
 });
 
 /**
@@ -102,6 +126,18 @@ export const GetFeaturedProductsResponseItem = zod.object({
   farmName: zod.string().optional(),
   origin: zod.string().optional(),
   isComingSoon: zod.boolean(),
+  isOrganic: zod.boolean(),
+  parentProductId: zod.number().nullish(),
+  organicVariant: zod
+    .union([
+      zod.object({
+        id: zod.number(),
+        price: zod.number(),
+        isComingSoon: zod.boolean(),
+      }),
+      zod.null(),
+    ])
+    .optional(),
 });
 export const GetFeaturedProductsResponse = zod.array(
   GetFeaturedProductsResponseItem,
