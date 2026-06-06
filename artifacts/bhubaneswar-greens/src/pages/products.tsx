@@ -38,7 +38,7 @@ function ProductCard({ product }: { product: any }) {
   const inCart = items[activeId]?.quantity ?? 0;
 
   const cartProduct = isOrganic && hasOrganic
-    ? { ...product, id: organicVariant.id, price: organicVariant.price, name: `${product.name} (Organic)` }
+    ? { ...product, id: organicVariant.id, price: organicVariant.price, name: `${product.name} (Organic)`, discountPercent: 0 }
     : product;
 
   const handleAdd = () => {

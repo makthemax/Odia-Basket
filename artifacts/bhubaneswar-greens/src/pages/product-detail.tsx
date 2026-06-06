@@ -51,7 +51,7 @@ export default function ProductDetail() {
   const mrp = !isOrganic && discount > 0 ? Math.round(parseFloat(String(product.price)) / (1 - discount / 100)) : null;
 
   const cartProduct = isOrganic && hasOrganic
-    ? { ...product, id: organicVariant.id, price: organicVariant.price, name: `${product.name} (Organic)` }
+    ? { ...product, id: organicVariant.id, price: organicVariant.price, name: `${product.name} (Organic)`, discountPercent: 0 }
     : product;
 
   const handleAddToCart = () => {
@@ -81,6 +81,20 @@ export default function ProductDetail() {
       <Link href="/products" className="inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground mb-4">
         <ArrowLeft className="h-4 w-4" /> Back to Sabji Bazar
       </Link>
+
+      {product.isOrganic && product.parentProductId && (
+        <div className="mb-4 flex items-center justify-between gap-3 bg-emerald-50 border border-emerald-200 rounded-2xl px-4 py-3">
+          <div className="flex items-center gap-2 text-sm text-emerald-800">
+            <Leaf className="h-4 w-4 shrink-0" />
+            <span>You're viewing the <strong>certified organic</strong> variant of this product.</span>
+          </div>
+          <Link href={`/products/${product.parentProductId}`}>
+            <Button size="sm" variant="outline" className="shrink-0 border-emerald-300 text-emerald-700 hover:bg-emerald-100 text-xs">
+              View Regular →
+            </Button>
+          </Link>
+        </div>
+      )}
 
       <div className="grid md:grid-cols-2 gap-8">
         {/* Image */}
