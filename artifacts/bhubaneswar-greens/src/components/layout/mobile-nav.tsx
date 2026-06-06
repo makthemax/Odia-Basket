@@ -1,5 +1,5 @@
 import { Link, useLocation } from "wouter";
-import { Home, Store, ShoppingCart, PackageSearch, HelpCircle } from "lucide-react";
+import { Home, Store, ShoppingCart, PackageSearch, HelpCircle, Flame } from "lucide-react";
 import { useCart } from "@/hooks/use-cart";
 import { useTourTrigger } from "@/components/tour-context";
 
@@ -12,7 +12,7 @@ export function MobileNav() {
     { href: "/", label: "Home", icon: Home },
     { href: "/products", label: "Shop", icon: Store },
     { href: "/cart", label: "Cart", icon: ShoppingCart, count: itemCount },
-    { href: "/orders", label: "Orders", icon: PackageSearch },
+    { href: "/secret", label: "Secret", icon: Flame },
   ];
 
   return (
