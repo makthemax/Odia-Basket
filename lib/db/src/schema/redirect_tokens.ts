@@ -5,13 +5,13 @@ import { z } from "zod/v4";
 export const redirectTokensTable = pgTable("redirect_tokens", {
   id: serial("id").primaryKey(),
   token: text("token").notNull().unique(),
-  targetUrl: text("target_url").notNull(),
-  metadata: text("metadata"),
-  used: boolean("used").notNull().default(false),
+  content: text("content").notNull(),
+  viewed: boolean("viewed").notNull().default(false),
+  viewedAt: timestamp("viewed_at", { withTimezone: true }),
   expiresAt: timestamp("expires_at", { withTimezone: true }),
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
 });
 
-export const insertRedirectTokenSchema = createInsertSchema(redirectTokensTable).omit({ id: true, createdAt: true });
+export const insertRedirectTokenSchema = createInsertSchema(redirectTokensTable).omit({ id: true, createdAt: true, viewedAt: true });
 export type InsertRedirectToken = z.infer<typeof insertRedirectTokenSchema>;
 export type RedirectToken = typeof redirectTokensTable.$inferSelect;

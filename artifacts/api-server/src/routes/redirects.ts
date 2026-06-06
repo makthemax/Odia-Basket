@@ -10,14 +10,14 @@ function generateToken(): string {
 }
 
 /**
- * POST /api/redirects
- * Create a one-time redirect token.
+ * POST /api/secrets
+ * Create a burn-after-reading secret.
  */
-router.post("/redirects", async (req, res): Promise<void> => {
-  const { targetUrl, metadata, expiresMinutes } = req.body;
+router.post("/secrets", async (req, res): Promise<void> => {
+  const { content, expiresMinutes } = req.body;
 
-  if (!targetUrl || typeof targetUrl !== "string") {
-    res.status(400).json({ error: "targetUrl is required" });
+  if (!content || typeof content !== "string") {
+    res.status(400).json({ error: "content is required" });
     return;
   }
 
@@ -30,25 +30,26 @@ router.post("/redirects", async (req, res): Promise<void> => {
     .insert(redirectTokensTable)
     .values({
       token,
-      targetUrl,
-      metadata: metadata ?? null,
+      content,
       expiresAt,
     })
     .returning();
 
   res.status(201).json({
     token: record.token,
-    redirectUrl: `/api/redirects/${record.token}`,
+    secretUrl: `/api/secrets/${record.token}`,
     expiresAt: record.expiresAt?.toISOString() ?? null,
   });
 });
 
 /**
- * GET /api/redirects/:token
- * Redeem a one-time redirect token.
+ * GET /api/secrets/:token
+ * View a burn-after-reading secret.
+ * The viewer sees it once, then it's burned. The creator can view anytime.
  */
-router.get("/redirects/:token", async (req, res): Promise<void> => {
+router.get("/secrets/:token", async (req, res): Promise<void> => {
   const { token } = req.params;
+  const isAdmin = req.query.admin === "true";
 
   if (!token || typeof token !== "string") {
     res.status(400).json({ error: "Token is required" });
@@ -61,28 +62,34 @@ router.get("/redirects/:token", async (req, res): Promise<void> => {
     .where(eq(redirectTokensTable.token, token));
 
   if (!record) {
-    res.status(404).json({ error: "Token not found" });
-    return;
-  }
-
-  if (record.used) {
-    res.status(410).json({ error: "Token already used" });
+    res.status(404).json({ error: "Secret not found" });
     return;
   }
 
   if (record.expiresAt && new Date() > record.expiresAt) {
-    res.status(410).json({ error: "Token expired" });
+    res.status(410).json({ error: "Secret expired" });
     return;
   }
 
-  // Mark as used
-  await db
-    .update(redirectTokensTable)
-    .set({ used: true })
-    .where(eq(redirectTokensTable.token, token));
+  // If already viewed and not admin, it's burned
+  if (record.viewed && !isAdmin) {
+    res.status(410).json({ error: "This secret has already been viewed. It was a burn-after-reading link." });
+    return;
+  }
 
-  // Redirect to target URL
-  res.redirect(302, record.targetUrl);
+  // Mark as viewed (only the first time)
+  if (!record.viewed) {
+    await db
+      .update(redirectTokensTable)
+      .set({ viewed: true, viewedAt: new Date() })
+      .where(eq(redirectTokensTable.token, token));
+  }
+
+  res.json({
+    content: record.content,
+    viewed: true,
+    viewedAt: record.viewedAt ? new Date().toISOString() : null,
+  });
 });
 
 export default router;

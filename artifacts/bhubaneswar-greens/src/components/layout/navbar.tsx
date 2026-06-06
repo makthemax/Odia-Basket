@@ -2,7 +2,7 @@ import { Link, useLocation } from "wouter";
 import { useEffect, useState } from "react";
 import { useCart } from "@/hooks/use-cart";
 import { useTourTrigger } from "@/components/tour-context";
-import { ShoppingCart, Sprout, MapPin, Search, ChevronDown, Tag, HelpCircle } from "lucide-react";
+import { ShoppingCart, Sprout, MapPin, Search, ChevronDown, Tag, HelpCircle, Flame } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 
@@ -93,6 +93,10 @@ export function Navbar() {
             </button>
             <Link href="/orders" className="text-sm font-semibold hover:text-primary transition-colors px-3 py-2 rounded-lg hover:bg-muted">
               Aaji r Order
+            </Link>
+            <Link href="/secret" className="text-sm font-semibold hover:text-amber-600 transition-colors px-3 py-2 rounded-lg hover:bg-amber-50 flex items-center gap-1.5">
+              <Flame className="h-4 w-4" />
+              Secret
             </Link>
           </nav>
 

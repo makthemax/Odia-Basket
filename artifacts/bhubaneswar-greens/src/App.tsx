@@ -15,6 +15,8 @@ import Orders from "@/pages/orders";
 import OrderTracking from "@/pages/order-tracking";
 import PaymentSuccess from "@/pages/payment-success";
 import Payment from "@/pages/payment";
+import SecretCreate from "@/pages/secret-create";
+import SecretView from "@/pages/secret-view";
 
 const queryClient = new QueryClient();
 
@@ -31,6 +33,8 @@ function Router() {
         <Route path="/orders/:id" component={OrderTracking} />
         <Route path="/payment" component={Payment} />
         <Route path="/payment-success" component={PaymentSuccess} />
+        <Route path="/secret" component={SecretCreate} />
+        <Route path="/secret/:token" component={SecretView} />
         <Route component={NotFound} />
       </Switch>
     </AppLayout>
