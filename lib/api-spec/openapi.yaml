@@ -274,6 +274,8 @@ components:
           type: string
         origin:
           type: string
+        isComingSoon:
+          type: boolean
       required:
         - id
         - name
@@ -283,6 +285,7 @@ components:
         - inStock
         - isFeatured
         - isSeasonal
+        - isComingSoon
 
     CreateOrderBody:
       type: object

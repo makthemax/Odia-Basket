@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useSearch } from "wouter";
 import { motion, AnimatePresence } from "framer-motion";
-import { Search, X, Star, Zap, Flame, SlidersHorizontal, Sprout } from "lucide-react";
+import { Search, X, Star, Zap, Flame, SlidersHorizontal, Sprout, Clock, Bell } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -67,7 +67,13 @@ function ProductCard({ product }: { product: any }) {
               <Flame className="h-3 w-3" /> Seasonal
             </Badge>
           )}
-          {!product.inStock && (
+          {product.isComingSoon && (
+            <div className="absolute inset-0 bg-gradient-to-b from-slate-900/60 to-slate-900/80 flex flex-col items-center justify-center gap-2">
+              <Clock className="h-7 w-7 text-white" />
+              <Badge className="bg-white text-slate-800 font-bold text-xs border-0 shadow-md">Coming Soon</Badge>
+            </div>
+          )}
+          {!product.inStock && !product.isComingSoon && (
             <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
               <Badge variant="destructive" className="text-sm">Astock Nahi</Badge>
             </div>
@@ -105,7 +111,11 @@ function ProductCard({ product }: { product: any }) {
         </div>
 
         <div className="mt-2.5">
-          {!product.inStock ? (
+          {product.isComingSoon ? (
+            <Button size="sm" variant="outline" className="w-full h-9 text-xs font-bold border-slate-300 text-slate-600 hover:bg-slate-100 gap-1.5" disabled>
+              <Bell className="h-3.5 w-3.5" /> Coming Soon
+            </Button>
+          ) : !product.inStock ? (
             <Button size="sm" disabled variant="outline" className="w-full h-9 text-xs">Out of stock</Button>
           ) : inCart > 0 ? (
             <div className="flex items-center justify-between gap-1 bg-secondary text-white rounded-lg h-9 px-1">

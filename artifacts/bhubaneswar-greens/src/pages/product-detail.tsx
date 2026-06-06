@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useParams, Link } from "wouter";
 import { motion } from "framer-motion";
-import { ArrowLeft, Plus, Minus, ShoppingCart, Zap, MapPin, Sprout } from "lucide-react";
+import { ArrowLeft, Plus, Minus, ShoppingCart, Zap, MapPin, Sprout, Clock, Bell } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
@@ -89,8 +89,17 @@ export default function ProductDetail() {
           <div className="absolute top-3 left-3 flex flex-col gap-1">
             {product.isSeasonal && <Badge className="bg-amber-500 text-white">Seasonal</Badge>}
             {(product.discountPercent ?? 0) > 0 && <Badge className="bg-primary text-white">{product.discountPercent}% OFF</Badge>}
-            {!product.inStock && <Badge variant="destructive">Astock Nahi</Badge>}
+            {!product.inStock && !product.isComingSoon && <Badge variant="destructive">Astock Nahi</Badge>}
           </div>
+          {product.isComingSoon && (
+            <div className="absolute inset-0 bg-gradient-to-b from-slate-900/50 to-slate-900/80 flex flex-col items-center justify-center gap-3 rounded-3xl">
+              <Clock className="h-12 w-12 text-white" />
+              <div className="text-center">
+                <Badge className="bg-white text-slate-800 font-bold text-sm border-0 shadow-md px-4 py-1">Coming Soon</Badge>
+                <p className="text-white/80 text-xs mt-2">This product will be available shortly</p>
+              </div>
+            </div>
+          )}
         </motion.div>
 
         {/* Details */}
@@ -138,7 +147,25 @@ export default function ProductDetail() {
             </div>
           )}
 
-          {product.inStock ? (
+          {product.isComingSoon ? (
+            <div className="p-5 bg-slate-50 border border-slate-200 rounded-2xl text-center space-y-3">
+              <div className="flex items-center justify-center gap-2 text-slate-600">
+                <Clock className="h-5 w-5" />
+                <span className="font-bold text-base">Coming Soon</span>
+              </div>
+              <p className="text-sm text-muted-foreground">This product isn't available yet — check back soon or explore similar items.</p>
+              <Button variant="outline" className="gap-2 border-slate-300" disabled>
+                <Bell className="h-4 w-4" /> Notify Me
+              </Button>
+              <div className="pt-1">
+                <Link href="/products">
+                  <Button variant="ghost" className="text-xs text-primary underline-offset-2 hover:underline">
+                    Browse available products →
+                  </Button>
+                </Link>
+              </div>
+            </div>
+          ) : product.inStock ? (
             <>
               {/* Quantity */}
               <div>

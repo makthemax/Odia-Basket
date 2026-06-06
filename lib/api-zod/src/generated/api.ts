@@ -52,6 +52,7 @@ export const ListProductsResponseItem = zod.object({
   discountPercent: zod.number().optional(),
   farmName: zod.string().optional(),
   origin: zod.string().optional(),
+  isComingSoon: zod.boolean(),
 });
 export const ListProductsResponse = zod.array(ListProductsResponseItem);
 
@@ -78,6 +79,7 @@ export const GetProductResponse = zod.object({
   discountPercent: zod.number().optional(),
   farmName: zod.string().optional(),
   origin: zod.string().optional(),
+  isComingSoon: zod.boolean(),
 });
 
 /**
@@ -99,6 +101,7 @@ export const GetFeaturedProductsResponseItem = zod.object({
   discountPercent: zod.number().optional(),
   farmName: zod.string().optional(),
   origin: zod.string().optional(),
+  isComingSoon: zod.boolean(),
 });
 export const GetFeaturedProductsResponse = zod.array(
   GetFeaturedProductsResponseItem,

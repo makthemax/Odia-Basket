@@ -22,4 +22,5 @@ export interface Product {
   discountPercent?: number;
   farmName?: string;
   origin?: string;
+  isComingSoon: boolean;
 }

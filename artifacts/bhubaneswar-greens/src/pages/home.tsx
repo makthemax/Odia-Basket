@@ -1,7 +1,7 @@
 import { Link } from "wouter";
 import { motion } from "framer-motion";
 import { useRef, useState } from "react";
-import { ArrowRight, Sprout, Truck, Star, Clock, Zap, ShieldCheck, BadgePercent, Flame, ChevronLeft, ChevronRight, Leaf } from "lucide-react";
+import { ArrowRight, Sprout, Truck, Star, Clock, Zap, ShieldCheck, BadgePercent, Flame, ChevronLeft, ChevronRight, Leaf, Bell } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Switch } from "@/components/ui/switch";
@@ -74,12 +74,18 @@ function ProductCard({ product }: { product: any }) {
             <Flame className="h-3 w-3" /> Seasonal
           </Badge>
         )}
-        {isOrganic && (
+        {isOrganic && !product.isComingSoon && (
           <div className="absolute bottom-0 left-0 right-0 bg-emerald-700/80 text-white text-[10px] font-bold px-2 py-1 flex items-center gap-1">
             <Leaf className="h-2.5 w-2.5" /> Pesticide-Free · FSSAI Organic
           </div>
         )}
-        {!product.inStock && (
+        {product.isComingSoon && (
+          <div className="absolute inset-0 bg-gradient-to-b from-slate-900/55 to-slate-900/80 flex flex-col items-center justify-center gap-1.5">
+            <Clock className="h-6 w-6 text-white" />
+            <Badge className="bg-white text-slate-800 font-bold text-[10px] border-0 shadow">Coming Soon</Badge>
+          </div>
+        )}
+        {!product.inStock && !product.isComingSoon && (
           <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
             <Badge variant="destructive">Astock Nahi</Badge>
           </div>
@@ -151,7 +157,11 @@ function ProductCard({ product }: { product: any }) {
         </div>
 
         <div className="mt-2.5">
-          {product.inStock ? (
+          {product.isComingSoon ? (
+            <Button size="sm" disabled variant="outline" className="w-full h-8 text-xs font-bold border-slate-300 text-slate-500 gap-1.5">
+              <Clock className="h-3 w-3" /> Coming Soon
+            </Button>
+          ) : product.inStock ? (
             <Button
               size="sm"
               onClick={handleAdd}

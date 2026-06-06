@@ -18,6 +18,7 @@ export const productsTable = pgTable("products", {
   discountPercent: integer("discount_percent").notNull().default(0),
   farmName: text("farm_name"),
   origin: text("origin"),
+  isComingSoon: boolean("is_coming_soon").notNull().default(false),
 });
 
 export const insertProductSchema = createInsertSchema(productsTable).omit({ id: true });
