@@ -304,14 +304,7 @@ export function ProductImage({
   className?: string;
   imgClassName?: string;
 }) {
-  const Illustration = getIllustration(product.name);
-  if (Illustration) {
-    return (
-      <div className={className}>
-        <Illustration className="w-full h-full object-cover" />
-      </div>
-    );
-  }
+  // Prefer real photos over SVG illustrations — SVGs are fallback only
   if (product.imageUrl) {
     return (
       <img
@@ -319,6 +312,14 @@ export function ProductImage({
         alt={product.name ?? ""}
         className={imgClassName ?? className}
       />
+    );
+  }
+  const Illustration = getIllustration(product.name);
+  if (Illustration) {
+    return (
+      <div className={className}>
+        <Illustration className="w-full h-full object-cover" />
+      </div>
     );
   }
   return <div className={className} />;
